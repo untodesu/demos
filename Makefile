@@ -3,16 +3,15 @@
 VERSION := 0.01
 VERSION_EXT :=
 
-# todo: build a goddamn cross-compiler and freely use the
-# $(ARCH)-$(TARGET)-gcc instead of $(TARGET)-gcc again.
-ARCH ?= ia32
-TARGET ?= i686-linux-gnu
+# todo: build the goddamn cross-compiler
+ARCH ?= i686
+TARGET ?= linux-gnu
 
 CONFIG ?= ./kernel.conf
 ARCH_CONFIG := ./arch/$(ARCH)/arch.conf
 
 MKCONFIG := ./scripts/mkconfig.sh
-GCC := $(TARGET)-gcc
+GCC := $(ARCH)-$(TARGET)-gcc
 
 CFLAGS := -std=gnu99 -ffreestanding -O3 -Wall -Wextra
 CPPFLAGS := -nostdinc -I ./include/ -I ./arch/$(ARCH)/include/
