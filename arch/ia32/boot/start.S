@@ -81,7 +81,7 @@ _start:
     addl $CONFIG_MEM_BASE_ADDR, %esp
     xorl %ebp, %ebp
 
-    call arch_main
+    call early_init
 
     cli
 3:  hlt

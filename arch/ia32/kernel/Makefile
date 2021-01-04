@@ -1,1 +1,2 @@
-sources_y += main.c
+sources_y += init.c
+sources_y += serial.c
