@@ -1,0 +1,5 @@
+.vscode/*
+*.o
+include/demos/config.h
+Makefile.config
+ldscript.ld
