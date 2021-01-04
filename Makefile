@@ -38,6 +38,7 @@ define add_subdir
 endef
 
 $(eval $(call add_subdir,arch/$(ARCH)))
+$(eval $(call add_subdir,lib))
 
 OBJECTS := $(SOURCES:=.o)
 BINARY := vmdemos-$(ARCH)-$(VERSION)$(VERSION_EXT)
