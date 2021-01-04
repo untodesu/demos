@@ -51,9 +51,9 @@ _start:
 
     // offset = index * sizeof(int32) = index * 4
     movl $(V2P(pgdir) + PGDIR_INDEX(0) * 4), %ebx
-    movl $(V2P(pgdir) + PGDIR_INDEX(CONFIG_MEM_BASE_ADDR) * 4), %edx
+    movl $(V2P(pgdir) + PGDIR_INDEX(CONFIG_BASE_ADDR) * 4), %edx
 
-    movl $CONFIG_MEM_PAGE_TABS, %ecx
+    movl $CONFIG_PAGE_TABLES, %ecx
 1:  movl %eax, (%ebx)
     movl %eax, (%edx)
     addl $(PG_COUNT * 4), %eax // pgtab_1 = pgtab_0 + (PG_COUNT * sizeof(int32))
@@ -78,7 +78,7 @@ _start:
     movw %ax, %gs
     movw %ax, %ss
 
-    addl $CONFIG_MEM_BASE_ADDR, %esp
+    addl $CONFIG_BASE_ADDR, %esp
     xorl %ebp, %ebp
 
     call early_init

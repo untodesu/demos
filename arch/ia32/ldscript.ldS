@@ -3,7 +3,7 @@
 ENTRY(_start)
 SECTIONS
 {
-    . = CONFIG_MEM_BASE_ADDR + CONFIG_MEM_LOAD_ADDR;
+    . = CONFIG_BASE_ADDR + CONFIG_LOAD_ADDR;
 
     .text ALIGN(4K) : AT(V2P(ADDR(.text)))
     {
