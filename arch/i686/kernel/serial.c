@@ -15,7 +15,7 @@ static struct serial_port ports[NUM_PORTS] = {
     { .io = 0x2E8, .ok = 0 },
 };
 
-int serial_init(int id, unsigned int speed)
+int init_serial(int id, unsigned int speed)
 {
     if(id < 0 || id >= NUM_PORTS)
         return 0;
