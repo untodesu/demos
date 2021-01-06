@@ -45,7 +45,7 @@ $(eval $(call add_subdir,arch/$(ARCH)))
 $(eval $(call add_subdir,lib))
 
 OBJECTS := $(SOURCES:=.o)
-BINARY := vmdemos-$(ARCH)-$(VERSION)$(VERSION_EXT)
+BINARY := $(CONFIG_BIN_PREFIX)demos-$(ARCH)-$(VERSION)$(VERSION_EXT)
 
 CLEAN_LIST += $(OBJECTS)
 CLEAN_LIST += $(BINARY)
