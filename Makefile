@@ -21,6 +21,9 @@ SOURCES :=
 CLEAN_LIST :=
 TREE := .
 
+# grob grob kladbishche pidor
+LDFLAGS += -L /usr/lib/gcc-cross/i686-linux-gnu/7/
+
 define add_subdir
         TREE := $$(TREE)/$(1)
 
@@ -66,7 +69,7 @@ clean:
 	@$(foreach item,$(CLEAN_LIST),echo "rm -f $(item)";rm -f $(item);)
 
 $(BINARY): $(OBJECTS)
-	$(GCC) $(LDFLAGS) $(OBJECTS) -o $(BINARY)
+	$(GCC) $(LDFLAGS) $(OBJECTS) -static-libgcc -lgcc  -o $(BINARY)
 
 $(OBJECTS): $(SOURCES)
 	$(GCC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $*

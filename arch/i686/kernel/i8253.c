@@ -6,7 +6,7 @@
 #define PIT_CH0 0x40
 #define PIT_CMD 0x43
 
-static uint32_t pit_ticks = 0;
+static uint64_t pit_ticks = 0;
 
 static void pit_intr(struct interrupt_frame *frame)
 {
@@ -24,7 +24,7 @@ void init_pit(void)
     outb(PIT_CH0, (divisor & 0xFF00) >> 8);
 }
 
-uint32_t pit_get_ticks(void)
+uint64_t pit_get_ticks(void)
 {
     return pit_ticks;
 }

@@ -12,7 +12,7 @@
 #define __weak          __attribute__((weak))
 
 // i686: va_list shits itself.
-#define __variadic __optimize(2)
+#define __variadic __optimize(1)
 
 #define unused_nw(x) ((void)(x))
 

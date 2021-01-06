@@ -19,6 +19,10 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 
+// libgcc allows us to do evil 64-bit math on 32-bit systems
+typedef uint64_t uintmax_t;
+typedef int64_t intmax_t;
+
 struct buffer {
     char *data;
     size_t size;
@@ -36,14 +40,20 @@ struct buffer {
 #define ILEN_CHAR       0   // hh
 #define ILEN_SHORT      1   // h
 #define ILEN_INT        2
-#define ILEN_SIZE_T     3   // z
-#define ILEN_PTRDIFF_T  4   // t
+#define ILEN_LONG       3   // l
+#define ILEN_DLONG      4   // ll
+#define ILEN_INTMAX_T   5   // j
+#define ILEN_SIZE_T     6   // z
+#define ILEN_PTRDIFF_T  7   // t
 
 #define va_arg_ilen(ap, ilen, iv)                                               \
     switch(ilen) {                                                              \
         case ILEN_CHAR:         iv = va_arg(ap, unsigned int);          break;  \
         case ILEN_SHORT:        iv = va_arg(ap, unsigned int);          break;  \
         case ILEN_INT:          iv = va_arg(ap, unsigned int);          break;  \
+        case ILEN_LONG:         iv = va_arg(ap, unsigned long);         break;  \
+        case ILEN_DLONG:        iv = va_arg(ap, unsigned long long);    break;  \
+        case ILEN_INTMAX_T:     iv = va_arg(ap, uintmax_t);             break;  \
         case ILEN_SIZE_T:       iv = va_arg(ap, size_t);                break;  \
         case ILEN_PTRDIFF_T:    iv = va_arg(ap, ptrdiff_t);             break;  \
         default:                iv = 0;                                 break;  \
@@ -79,7 +89,7 @@ static inline void buffer_write(struct buffer *buf, char c)
 
 #define MAX_BASE 16
 
-static void buffer_write_int(struct buffer *buf, uint32_t iv, int flags, size_t width, size_t precision, int ilen, int base)
+static void buffer_write_int(struct buffer *buf, uintmax_t iv, int flags, size_t width, size_t precision, int ilen, int base)
 {
     const char *digits = (flags & FLAGS_UPPERCASE) ? "0123456789ABCDEF" : "0123456789abcdef";
     if(base > MAX_BASE)
@@ -95,6 +105,9 @@ static void buffer_write_int(struct buffer *buf, uint32_t iv, int flags, size_t 
             case ILEN_CHAR:         de_sign(iv, sign, signed char);         break;
             case ILEN_SHORT:        de_sign(iv, sign, signed short);        break;
             case ILEN_INT:          de_sign(iv, sign, signed int);          break;
+            case ILEN_LONG:         de_sign(iv, sign, signed long);         break;
+            case ILEN_DLONG:        de_sign(iv, sign, signed long long);    break;
+            case ILEN_INTMAX_T:     de_sign(iv, sign, intmax_t);            break;
             case ILEN_PTRDIFF_T:    de_sign(iv, sign, ptrdiff_t);           break;
         }
     }
@@ -181,7 +194,7 @@ static void buffer_write_str(struct buffer *buf, const char *str, int flags, siz
     }
 }
 
-int __variadic sprintf(char *s, const char *fmt, ...)
+int sprintf(char *s, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -190,12 +203,12 @@ int __variadic sprintf(char *s, const char *fmt, ...)
     return p;
 }
 
-int __variadic vsprintf(char *s, const char *fmt, va_list ap)
+int vsprintf(char *s, const char *fmt, va_list ap)
 {
     return vsnprintf(s, (size_t)-1, fmt, ap);
 }
 
-int __variadic snprintf(char *s, size_t n, const char *fmt, ...)
+int snprintf(char *s, size_t n, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -204,7 +217,7 @@ int __variadic snprintf(char *s, size_t n, const char *fmt, ...)
     return p;
 }
 
-int __variadic vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
+int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 {
     struct buffer buf = { s, n, 0 };
     while(*fmt) {
@@ -238,6 +251,8 @@ int __variadic vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
         int ilen = ILEN_INT;
         switch(*fmt) {
             case 'h':   ilen = (*++fmt == 'h') ? ILEN_CHAR : ILEN_SHORT;    break;
+            case 'l':   ilen = (*++fmt == 'l') ? ILEN_DLONG : ILEN_LONG;    break;
+            case 'j':   ilen = ILEN_INTMAX_T;                               break;
             case 'z':   ilen = ILEN_SIZE_T;                                 break;
             case 't':   ilen = ILEN_PTRDIFF_T;                              break;
         }
@@ -245,7 +260,7 @@ int __variadic vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
         if(ilen != ILEN_INT)
             fmt++;
 
-        uint32_t iv = 0;
+        uintmax_t iv = 0;
         switch (*fmt) {
             case 'd': case 'i':
                 flags |= FLAGS_SIGNED;
@@ -292,7 +307,7 @@ int __variadic vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
                 flags |= FLAGS_UPPERCASE;
                 flags |= FLAGS_ZEROPAD;
                 // sizeof(uintptr_t) is in bytes, one byte in hex contains 2 digits.
-                buffer_write_int(&buf, (uintptr_t)va_arg(ap, void *), flags, sizeof(uintptr_t) * 2, precision, ILEN_INT, 16);
+                buffer_write_int(&buf, (uintptr_t)va_arg(ap, void *), flags, sizeof(uintptr_t) * 2, precision, ILEN_INTMAX_T, 16);
                 break;
         }
         fmt++;
