@@ -301,8 +301,8 @@ void common_interrupt_handler(struct interrupt_frame *frame)
     uint8_t irq_no = (frame->int_no - I8259_IRQ0);
 
     if(is_irq) {
-        i8259_send_eoi(irq_no);
-        i8259_mask_irq(irq_no);
+        pic_send_eoi(irq_no);
+        pic_mask_irq(irq_no);
     }
 
     interrupt_handler_t handler = handlers[frame->int_no];
@@ -310,7 +310,7 @@ void common_interrupt_handler(struct interrupt_frame *frame)
         handler(frame);
     
     if(is_irq)
-        i8259_unmask_irq(irq_no);
+        pic_unmask_irq(irq_no);
 }
 
 void init_interrupts(void)
@@ -585,7 +585,7 @@ int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler)
         return 0;
     
     if(int_no >= I8259_IRQ0 && int_no <= I8259_IRQ15)
-        i8259_unmask_irq(int_no - I8259_IRQ0);
+        pic_unmask_irq(int_no - I8259_IRQ0);
 
     handlers[int_no] = handler;
     return 1;
