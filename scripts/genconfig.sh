@@ -33,8 +33,8 @@ case "$target" in
         target_replace="#define CONFIG_\\U\\1 \\E\\2"
         if [[ -z "$macro" ]]
         then
-            target_begin_1="#ifndef __MKCONFIG_H__"
-            target_begin_2="#define __MKCONFIG_H__"
+            target_begin_1="#ifndef __GENCONFIG_H__"
+            target_begin_2="#define __GENCONFIG_H__"
         else
             target_begin_1="#ifndef $macro"
             target_begin_2="#define $macro"

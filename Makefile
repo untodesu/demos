@@ -3,15 +3,13 @@
 VERSION := 0.01
 VERSION_EXT :=
 
-# todo: build the goddamn cross-compiler
 ARCH ?= i686
-TARGET ?= linux-gnu
 
 CONFIG ?= ./kernel.conf
 ARCH_CONFIG := ./arch/$(ARCH)/arch.conf
 
-MKCONFIG := ./scripts/mkconfig.sh
-GCC := $(ARCH)-$(TARGET)-gcc
+GENCONFIG := ./scripts/genconfig.sh
+GCC := $(shell ./scripts/$(ARCH)-findgcc.sh)
 
 CFLAGS := -std=gnu99 -ffreestanding -O3 -Wall -Wextra
 CPPFLAGS := -nostdinc -I ./include/ -I ./arch/$(ARCH)/include/
@@ -55,8 +53,8 @@ CLEAN_LIST += $(BINARY)
 all:
 
 configure: $(CONFIG) $(ARCH_CONFIG)
-	$(MKCONFIG) -t c $(CONFIG) $(ARCH_CONFIG) > ./include/demos/config.h
-	$(MKCONFIG) -t mk $(CONFIG) $(ARCH_CONFIG) > ./Makefile.config
+	$(GENCONFIG) -t c $(CONFIG) $(ARCH_CONFIG) > ./include/demos/config.h
+	$(GENCONFIG) -t mk $(CONFIG) $(ARCH_CONFIG) > ./Makefile.config
 	$(GCC) $(CPPFLAGS) -E -xc -D__ASSEMBLER__ ./arch/$(ARCH)/ldscript.ldS | grep -v "^#" > ./ldscript.ld
 
 CLEAN_LIST += ./include/demos/config.h
