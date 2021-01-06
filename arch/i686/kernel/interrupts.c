@@ -1,3 +1,4 @@
+#include <arch/i8259.h>
 #include <arch/interrupts.h>
 #include <arch/segment.h>
 #include <demos/string.h>
@@ -296,9 +297,20 @@ static inline void set_gate(uint8_t int_no, uint16_t selector, uint8_t type, uin
 
 void common_interrupt_handler(struct interrupt_frame *frame)
 {
+    int is_irq = (frame->int_no >= I8259_IRQ0 && frame->int_no <= I8259_IRQ15);
+    uint8_t irq_no = (frame->int_no - I8259_IRQ0);
+
+    if(is_irq) {
+        i8259_send_eoi(irq_no);
+        i8259_mask_irq(irq_no);
+    }
+
     interrupt_handler_t handler = handlers[frame->int_no];
     if(handler != NULL)
         handler(frame);
+    
+    if(is_irq)
+        i8259_unmask_irq(irq_no);
 }
 
 void init_interrupts(void)
@@ -572,6 +584,9 @@ int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler)
     if(handlers[int_no] != NULL)
         return 0;
     
+    if(int_no >= I8259_IRQ0 && int_no <= I8259_IRQ15)
+        i8259_unmask_irq(int_no - I8259_IRQ0);
+
     handlers[int_no] = handler;
     return 1;
 }
