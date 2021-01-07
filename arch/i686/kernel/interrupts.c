@@ -1,7 +1,7 @@
 #include <arch/i8259.h>
 #include <arch/interrupts.h>
 #include <arch/segment.h>
-#include <demos/string.h>
+#include <string.h>
 
 #define IDT_SIZE 256
 

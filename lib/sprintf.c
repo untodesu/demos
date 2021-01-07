@@ -1,6 +1,6 @@
-#include <demos/ctype.h>
-#include <demos/sprintf.h>
-#include <demos/string.h>
+#include <ctype.h>
+#include <sprintf.h>
+#include <string.h>
 
 //
 // Copyright (C) 2018, Joe Davis <me@jo.ie>

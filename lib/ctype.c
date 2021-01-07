@@ -1,4 +1,4 @@
-#include <demos/ctype.h>
+#include <ctype.h>
 
 unsigned char _ctype[] = {
     0x00,

@@ -1,8 +1,8 @@
 #ifndef __DEMOS_SPRINTF_H__
 #define __DEMOS_SPRINTF_H__ 1
-#include <arch/stdarg.h>
 #include <arch/types.h>
 #include <demos/compiler.h>
+#include <stdarg.h>
 
 int sprintf(char *s, const char *fmt, ...) __printf(2, 3);
 int vsprintf(char *s, const char *fmt, va_list ap);
