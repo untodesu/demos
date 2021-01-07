@@ -1,5 +1,5 @@
-#ifndef __DEMOS_STRING_H__
-#define __DEMOS_STRING_H__ 1
+#ifndef __STRING_H__
+#define __STRING_H__ 1
 #include <arch/types.h>
 
 void * memset(void *s, int c, size_t n);

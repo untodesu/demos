@@ -1,5 +1,5 @@
-#ifndef __DEMOS_SPRINTF_H__
-#define __DEMOS_SPRINTF_H__ 1
+#ifndef __SPRINTF_H__
+#define __SPRINTF_H__ 1
 #include <arch/types.h>
 #include <demos/compiler.h>
 #include <stdarg.h>

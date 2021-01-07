@@ -1,5 +1,5 @@
-#ifndef __DEMOS_CTYPE_H__
-#define __DEMOS_CTYPE_H__ 1
+#ifndef __CTYPE_H__
+#define __CTYPE_H__ 1
 
 #define _CTYPE_UC 0x01
 #define _CTYPE_LC 0x02
