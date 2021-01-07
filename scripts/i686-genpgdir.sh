@@ -4,7 +4,7 @@ numptab=0
 
 while getopts "n:h" option; do
     if [[ "$option" = 'n' ]]; then
-        numptab=$(($OPTARG - 1))
+        numptab=$((OPTARG - 1))
         continue
     fi
 
@@ -17,7 +17,7 @@ done
 
 echo "//"
 echo "// generated: $(date)"
-echo "// numptab: $(($numptab + 1)) [default: 1]"
+echo "// numptab: $((numptab + 1)) [default: 1]"
 echo "//"
 echo "#include <arch/paging.h>"
 echo

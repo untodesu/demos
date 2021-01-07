@@ -48,7 +48,7 @@ case "$target" in
         ;;
 esac
 
-shift $(($OPTIND - 1))
+shift $((OPTIND - 1))
 sources=$@
 
 echo "$target_comment"
