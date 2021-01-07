@@ -8,19 +8,17 @@ ARCH ?= i686
 CONFIG ?= ./kernel.conf
 ARCH_CONFIG := ./arch/$(ARCH)/arch.conf
 
+ARCH_FINDGCC := ./scripts/$(ARCH)-findgcc.sh
 GENCONFIG := ./scripts/genconfig.sh
-GCC := $(shell ./scripts/$(ARCH)-findgcc.sh)
+GCC := $(shell $(ARCH_FINDGCC))
 
 CFLAGS := -std=gnu99 -ffreestanding -O3 -Wall -Wextra
 CPPFLAGS := -nostdinc -I ./include/ -I ./arch/$(ARCH)/include/
-LDFLAGS := -nostdlib -T ./ldscript.ld
+LDFLAGS := -nostdlib -T ./ldscript.ld -L $(shell $(ARCH_FINDGCC) -L)
 
 SOURCES :=
 CLEAN_LIST :=
 TREE := .
-
-# grob grob kladbishche pidor
-LDFLAGS += -L /usr/lib/gcc-cross/i686-linux-gnu/7/
 
 define add_subdir
         TREE := $$(TREE)/$(1)
