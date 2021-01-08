@@ -11,8 +11,8 @@ void init_pic(void)
 {
     outb(PIC1_PORT + 0, 0x11);
     outb(PIC2_PORT + 0, 0x11);
-    outb(PIC1_PORT + 1, I8259_IRQ0);
-    outb(PIC2_PORT + 1, I8259_IRQ8);
+    outb(PIC1_PORT + 1, PIC_IRQ0);
+    outb(PIC2_PORT + 1, PIC_IRQ8);
     outb(PIC1_PORT + 1, 0x04);
     outb(PIC2_PORT + 1, 0x02);
     outb(PIC1_PORT + 1, 0x01);

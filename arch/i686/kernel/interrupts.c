@@ -297,8 +297,8 @@ static inline void set_gate(uint8_t int_no, uint16_t selector, uint8_t type, uin
 
 void common_interrupt_handler(struct interrupt_frame *frame)
 {
-    int is_irq = (frame->int_no >= I8259_IRQ0 && frame->int_no <= I8259_IRQ15);
-    uint8_t irq_no = (frame->int_no - I8259_IRQ0);
+    int is_irq = (frame->int_no >= PIC_IRQ0 && frame->int_no <= PIC_IRQ15);
+    uint8_t irq_no = (frame->int_no - PIC_IRQ0);
 
     if(is_irq) {
         pic_send_eoi(irq_no);
@@ -584,8 +584,8 @@ int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler)
     if(handlers[int_no] != NULL)
         return 0;
     
-    if(int_no >= I8259_IRQ0 && int_no <= I8259_IRQ15)
-        pic_unmask_irq(int_no - I8259_IRQ0);
+    if(int_no >= PIC_IRQ0 && int_no <= PIC_IRQ15)
+        pic_unmask_irq(int_no - PIC_IRQ0);
 
     handlers[int_no] = handler;
     return 1;

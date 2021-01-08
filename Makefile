@@ -65,7 +65,7 @@ clean:
 	@$(foreach item,$(CLEAN_LIST),echo "rm -f $(item)";rm -f $(item);)
 
 $(BINARY): $(OBJECTS)
-	$(GCC) $(LDFLAGS) $(OBJECTS) -static-libgcc -lgcc  -o $(BINARY)
+	$(GCC) $(LDFLAGS) $(OBJECTS) -static-libgcc -lgcc -o $(BINARY)
 
 $(OBJECTS): $(SOURCES)
 	$(GCC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $*
