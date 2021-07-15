@@ -1,7 +1,3 @@
-#include <ctype.h>
-#include <sprintf.h>
-#include <string.h>
-
 //
 // Copyright (C) 2018, Joe Davis <me@jo.ie>
 // Copyright (C) 2020, 2021, Kirill GPRB
@@ -18,10 +14,10 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
-
-// libgcc allows us to do evil 64-bit math on 32-bit systems
-typedef uint64_t uintmax_t;
-typedef int64_t intmax_t;
+#include <arch/stdint.h>
+#include <ctype.h>
+#include <sprintf.h>
+#include <string.h>
 
 struct buffer {
     char *data;
