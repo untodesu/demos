@@ -2,10 +2,8 @@
 include/config.h
 isoroot/boot/limine.cfg
 isoroot/boot/demos*.elf
-config_cc.mk
-config_clean.mk
-config.mk
-kernel.ld
+config.*.mk
+link.ld
 demos*.elf
 demos*.iso
 *.c.o
