@@ -5,7 +5,7 @@ INTERNALCCFLAGS :=			\
 	-std=gnu99				\
 	-ffreestanding			\
 	-fno-stack-protector	\
-	-fno-pic -fpie			\
+	-fno-pie -fPIC			\
 	-mno-80387				\
 	-mno-mmx				\
 	-mno-3dnow				\
@@ -16,12 +16,11 @@ INTERNALCPFLAGS :=		\
 	$(CONFIG_CPFLAGS)	\
 	-nostdinc
 
-INTERNALLDFLAGS	:=								\
-	-fno-pic -fpie								\
-	-Wl,-static,-pie,--no-dynamic-linker,-ztext	\
-	-static-pie									\
-	-nostdlib									\
-	-T ./link.ld								\
+INTERNALLDFLAGS	:=							\
+	-fno-pie -fPIC							\
+	-Wl,-static,--no-dynamic-linker,-ztext	\
+	-nostdlib								\
+	-T ./link.ld							\
 	-z max-page-size=0x1000
 
 CC := $(CONFIG_GCC)

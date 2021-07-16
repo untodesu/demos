@@ -14,7 +14,6 @@ subdirs_y += kernel
 iso: $(ISOIMG)
 
 $(ISOIMG): $(ISOBIN) $(ISOCFG)
-	echo $(BINARY)
 	xorriso	-as mkisofs -b limine-cd.bin								\
 			-no-emul-boot -boot-load-size 4 -boot-info-table			\
 			--efi-boot limine-eltorito-efi.bin							\

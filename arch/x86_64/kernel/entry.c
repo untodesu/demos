@@ -1,3 +1,4 @@
+#include <arch/segment.h>
 #include <arch/serial.h>
 #include <arch/stivale2.h>
 #include <config.h>
@@ -5,6 +6,7 @@
 
 static void __noreturn kmain(struct stivale2_struct *stivale)
 {
+    init_gdt();
     if(!init_serial(SERIAL0, 8000))
         goto hang;
     serial_write(SERIAL0, "Test message", 12);
