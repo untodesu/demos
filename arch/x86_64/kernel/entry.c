@@ -1,15 +1,31 @@
+#include <arch/interrupts.h>
 #include <arch/segment.h>
 #include <arch/serial.h>
 #include <arch/stivale2.h>
 #include <config.h>
 #include <demos/cdefs.h>
+#include <demos/kprintf.h>
+
+static void kprintf_func_serial(const void *s, size_t n)
+{
+    serial_write(SERIAL0, s, n);
+}
+
+static void test_handle(struct interrupt_frame *frame)
+{
+    kprintf("Int $0x42 has been called!\n");
+    kprintf("RIP: %016llX\n", frame->rip);
+}
 
 static void __noreturn kmain(struct stivale2_struct *stivale)
 {
-    init_gdt();
+    init_segment();
+    init_interrupts();
     if(!init_serial(SERIAL0, 8000))
         goto hang;
-    serial_write(SERIAL0, "Test message", 12);
+    set_kprintf_func(kprintf_func_serial);
+    set_interrupt_handler(0x42, test_handle);
+    asm volatile("int $0x42");
 hang:
     for(;;) asm volatile("hlt");
 }

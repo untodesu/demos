@@ -56,6 +56,7 @@ BINARY := demos-$(CONFIG_VERSION).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(CONFIG_ARCHDIR)))
+$(eval $(call add_subdir,kernel))
 $(eval $(call add_subdir,lib))
 
 OBJECTS := $(SOURCES:=.o)
