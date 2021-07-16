@@ -26,6 +26,7 @@ static void __noreturn kmain(struct stivale2_struct *stivale)
     set_kprintf_func(kprintf_func_serial);
     set_interrupt_handler(0x42, test_handle);
     asm volatile("int $0x42");
+    kprintf("Loader: %s %s\n", stivale->bootloader_brand, stivale->bootloader_version);
 hang:
     for(;;) asm volatile("hlt");
 }
