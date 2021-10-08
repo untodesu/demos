@@ -1,0 +1,3 @@
+x86_64-elf-gcc
+x86_64-unknown-elf-gcc
+gcc -m64
