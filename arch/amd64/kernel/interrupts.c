@@ -3,8 +3,6 @@
 #include <demos/cdefs.h>
 #include <string.h>
 
-#define IDT_SIZE (256)
-
 #define IDT_TRAP    (15 << 0)
 #define IDT_INTR    (14 << 0)
 #define IDT_RING_0  ( 0 << 5)
@@ -308,9 +306,12 @@ extern void interrupt_FD(void);
 extern void interrupt_FE(void);
 extern void interrupt_FF(void);
 
-void set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler)
+int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler)
 {
+    if(handlers[int_no])
+        return 0;
     handlers[int_no] = handler;
+    return 1;
 }
 
 void init_interrupts(void)

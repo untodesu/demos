@@ -1,19 +1,19 @@
-//
-// Copyright (C) 2018, Joe Davis <me@jo.ie>
-// Copyright (C) 2020, 2021, Kirill GPRB
-//
-// Permission to use, copy, modify, and/or distribute this software for any
-// purpose with or without fee is hereby granted, provided that the above
-// copyright notice and this permission notice appear in all copies.
-//
-// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-//
+/*
+ * Copyright (C) 2018, Joe Davis <me@jo.ie>
+ * Copyright (C) 2020, 2021, Kirill GPRB
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 #include <arch/stdint.h>
 #include <ctype.h>
 #include <sprintf.h>
@@ -33,14 +33,14 @@ struct buffer {
 #define FLAGS_SIGNED    (1 << 5)
 #define FLAGS_UPPERCASE (1 << 6)
 
-#define ILEN_CHAR       0   // hh
-#define ILEN_SHORT      1   // h
+#define ILEN_CHAR       0   /* hh */
+#define ILEN_SHORT      1   /* h  */
 #define ILEN_INT        2
-#define ILEN_LONG       3   // l
-#define ILEN_DLONG      4   // ll
-#define ILEN_INTMAX_T   5   // j
-#define ILEN_SIZE_T     6   // z
-#define ILEN_PTRDIFF_T  7   // t
+#define ILEN_LONG       3   /* l  */
+#define ILEN_DLONG      4   /* ll */
+#define ILEN_INTMAX_T   5   /* j  */
+#define ILEN_SIZE_T     6   /* z  */
+#define ILEN_PTRDIFF_T  7   /* t  */
 
 #define va_arg_ilen(ap, ilen, iv)                                               \
     switch(ilen) {                                                              \
@@ -253,7 +253,7 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
             case 't':   ilen = ILEN_PTRDIFF_T;                              break;
         }
 
-        if(ilen != ILEN_INT)
+        if(ilen != ILEN_INT && ilen != ILEN_SHORT && ilen != ILEN_LONG)
             fmt++;
 
         uintmax_t iv = 0;
@@ -302,10 +302,11 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
                 flags |= FLAGS_HASH;
                 flags |= FLAGS_UPPERCASE;
                 flags |= FLAGS_ZEROPAD;
-                // sizeof(uintptr_t) is in bytes, one byte in hex contains 2 digits.
+                /* sizeof(uintptr_t) is in bytes, one byte in hex contains 2 digits. */
                 buffer_write_int(&buf, (uintptr_t)va_arg(ap, void *), flags, sizeof(uintptr_t) * 2, precision, ILEN_INTMAX_T, 16);
                 break;
         }
+
         fmt++;
     }
 

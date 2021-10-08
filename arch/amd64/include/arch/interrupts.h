@@ -14,7 +14,7 @@ struct interrupt_frame {
 
 typedef void(*interrupt_handler_t)(struct interrupt_frame *);
 
-void set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler);
+int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler);
 void init_interrupts(void);
 
 static inline void enable_interrupts(void)

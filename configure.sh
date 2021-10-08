@@ -22,10 +22,14 @@ function check_file {
     fi
 }
 
+function clean_file {
+    echo "CONFIG_CLEAN_LIST += $1" >> "$rootdir/config.1.mk"
+}
+
 arch=
 if [ -z "$1" ]; then
-    >&2 echo "argv[1] not specified, defaulting target architecture to x86_64"
-    arch="x86_64"
+    arch="i686"
+    >&2 echo "argv[1] not specified, defaulting target architecture to $arch"
 else
     >&2 echo "Setting target architecture to $1"
     arch="$1"
@@ -41,6 +45,9 @@ check_file "$archdir/link.in.ld"
 
 sh "$rootdir/tools/confc.sh" "$rootdir/kernel.conf" "$archdir/arch.conf" > "$rootdir/include/config.h"
 sh "$rootdir/tools/confm.sh" "$rootdir/kernel.conf" "$archdir/arch.conf" > "$rootdir/config.0.mk"
+sh "$rootdir/tools/confs.sh" "$rootdir/kernel.conf" "$archdir/arch.conf" > "$rootdir/config.sh"
+
+source "$rootdir/config.sh"
 
 GCC="gcc"
 while IFS= read -r line; do
@@ -61,6 +68,7 @@ echo "CONFIG_CLEAN_LIST :="                             >> "$rootdir/config.1.mk
 echo "CONFIG_CLEAN_LIST += $rootdir/include/config.h"   >> "$rootdir/config.1.mk"
 echo "CONFIG_CLEAN_LIST += $rootdir/config.0.mk"        >> "$rootdir/config.1.mk"
 echo "CONFIG_CLEAN_LIST += $rootdir/config.1.mk"        >> "$rootdir/config.1.mk"
+echo "CONFIG_CLEAN_LIST += $rootdir/config.sh"          >> "$rootdir/config.1.mk"
 echo "CONFIG_CLEAN_LIST += $rootdir/link.ld"            >> "$rootdir/config.1.mk"
 echo "CONFIG_CPFLAGS :="                                >> "$rootdir/config.1.mk"
 echo "CONFIG_CPFLAGS += -I $rootdir/include"            >> "$rootdir/config.1.mk"

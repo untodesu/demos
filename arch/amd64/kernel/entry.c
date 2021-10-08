@@ -13,8 +13,8 @@ static void kprintf_func_serial(const void *s, size_t n)
 
 static void test_handle(struct interrupt_frame *frame)
 {
-    kprintf("Int $0x42 has been called!\n");
-    kprintf("RIP: %016llX\n", frame->rip);
+    kprintf("Int $0x42 has been called!\r\n");
+    kprintf("RIP: %016llX\r\n", frame->rip);
 }
 
 static void __noreturn kmain(struct stivale2_struct *stivale)
@@ -26,7 +26,7 @@ static void __noreturn kmain(struct stivale2_struct *stivale)
     set_kprintf_func(kprintf_func_serial);
     set_interrupt_handler(0x42, test_handle);
     asm volatile("int $0x42");
-    kprintf("Loader: %s %s\n", stivale->bootloader_brand, stivale->bootloader_version);
+    kprintf("Loader: %s %s\r\n", stivale->bootloader_brand, stivale->bootloader_version);
 hang:
     for(;;) asm volatile("hlt");
 }

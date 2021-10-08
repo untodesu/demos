@@ -1,3 +1,15 @@
+CCFLAGS +=			\
+	-fno-pie -fPIC	\
+	-mno-80387		\
+	-mno-mmx		\
+	-mno-3dnow		\
+	-mno-sse -mno-sse2
+
+LDFLAGS +=									\
+	-fno-pie -fPIC							\
+	-Wl,-static,--no-dynamic-linker,-ztext	\
+	-z max-page-size=0x1000
+
 ISOBIN := $(CONFIG_ARCHDIR)/isoroot/boot/$(BINARY)
 ISOCFG := $(CONFIG_ARCHDIR)/isoroot/boot/limine.cfg
 ISOSRC := $(CONFIG_ARCHDIR)/limine.in.cfg

@@ -1,7 +1,7 @@
 #!/bin/sh
 shift $((OPTIND - 1))
-echo "// generated: $(date -R)"
-echo "// sources: $@"
+echo "/* generated: $(date -R)"
+echo " * sources: $@ */"
 echo "#ifndef CONFIG_H"
 echo "#define CONFIG_H 1"
 for source in $@

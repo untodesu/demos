@@ -1,27 +1,20 @@
 include ./config.0.mk
 include ./config.1.mk
 
-INTERNALCCFLAGS :=			\
-	-std=gnu99				\
-	-ffreestanding			\
-	-fno-stack-protector	\
-	-fno-pie -fPIC			\
-	-mno-80387				\
-	-mno-mmx				\
-	-mno-3dnow				\
-	-mno-sse -mno-sse2		\
-	-mno-red-zone
+INTERNALCCFLAGS :=	\
+	-std=gnu99		\
+	-ffreestanding	\
+	-O3				\
+	-Wall			\
+	-Wextra
 
-INTERNALCPFLAGS :=		\
-	$(CONFIG_CPFLAGS)	\
-	-nostdinc
+INTERNALCPFLAGS :=	\
+	-nostdinc		\
+	$(CONFIG_CPFLAGS)
 
-INTERNALLDFLAGS	:=							\
-	-fno-pie -fPIC							\
-	-Wl,-static,--no-dynamic-linker,-ztext	\
-	-nostdlib								\
-	-T ./link.ld							\
-	-z max-page-size=0x1000
+INTERNALLDFLAGS :=	\
+	-nostdlib		\
+	-T ./link.ld
 
 CC := $(CONFIG_GCC)
 
@@ -52,7 +45,7 @@ define add_subdir
     TREE := $$(patsubst %/$(1),%,$$(TREE))
 endef
 
-BINARY := demos-$(CONFIG_VERSION).elf
+BINARY := demos-$(CONFIG_VERSION)-$(CONFIG_ARCH).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(CONFIG_ARCHDIR)))
@@ -77,7 +70,7 @@ soft_clean:
 	@$(foreach item,$(CLEAN_LIST),echo "rm -f $(item)";rm -f $(item);)
 
 $(BINARY): $(OBJECTS)
-	$(CC) $(CCFLAGS) $(LDFLAGS) -static-libgcc -lgcc -o $(BINARY) $(OBJECTS)
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(OBJECTS) -static-libgcc -lgcc -o $(BINARY)
 
 $(OBJECTS): $(SOURCES)
 	$(CC) $(CCFLAGS) $(CPFLAGS) -c -o $@ $*

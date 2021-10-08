@@ -47,12 +47,6 @@ void serial_write(int id, const void *s, size_t n)
     if(port != 0xFFFF) {
         const unsigned char *sp = s;
         while(n--) {
-            // lf -> crlf
-            if(*sp == '\n') {
-                while(!(inb(port + 5) & 0x20));
-                outb(port + 0, '\r');
-            }
-
             while(!(inb(port + 5) & 0x20));
             outb(port + 0, *sp++);
         }
