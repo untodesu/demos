@@ -1,2 +1,6 @@
+check_file "$archdir/grub.in.cfg"
+command -v mformat > /dev/null || die "mformat not found"
+command -v xorriso > /dev/null || die "xorriso not found"
+command -v grub-mkrescue > /dev/null || die "grub-mkrescue not found"
 sh "$archdir/tools/genpgdir.sh" "$CONFIG_X86_INIT_PGDIR_SIZE" > "$archdir/boot/pgdir.S"
 clean_file "$archdir/boot/pgdir.S"

@@ -13,7 +13,7 @@ LDFLAGS +=									\
 ISOBIN := $(CONFIG_ARCHDIR)/isoroot/boot/$(BINARY)
 ISOCFG := $(CONFIG_ARCHDIR)/isoroot/boot/limine.cfg
 ISOSRC := $(CONFIG_ARCHDIR)/limine.in.cfg
-ISOIMG := $(CONFIG_ROOTDIR)/demos-$(CONFIG_ARCH)-$(CONFIG_VERSION).iso
+ISOIMG := $(CONFIG_ROOTDIR)/demos-$(CONFIG_VERSION)-$(CONFIG_ARCH).iso
 
 clean_list_root_y += $(ISOBIN)
 clean_list_root_y += $(ISOCFG)
