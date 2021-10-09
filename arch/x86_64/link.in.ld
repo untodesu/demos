@@ -1,0 +1,32 @@
+#include <config.h>
+
+SECTIONS
+{
+    . = CONFIG_VIRTUAL_BASE + CONFIG_BASE_ADDRESS;
+
+    .stivale2hdr ALIGN(4K) : {
+        *(.stivale2hdr)
+        *(.stivale2hdr.*)
+    }
+
+    .text ALIGN(4K) : {
+        *(.text)
+        *(.text.*)
+    }
+
+    .data ALIGN(4K) : {
+        *(.data)
+        *(.data.*)
+    }
+
+    .rodata ALIGN(4K) : {
+        *(.rodata)
+        *(.rodata.*)
+    }
+
+    .bss ALIGN(4K) : {
+        *(COMMON)
+        *(.bss)
+        *(.bss.*)
+    }
+}

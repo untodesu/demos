@@ -45,7 +45,7 @@ define add_subdir
     TREE := $$(patsubst %/$(1),%,$$(TREE))
 endef
 
-BINARY := demos-$(CONFIG_VERSION)-$(CONFIG_ARCHNAME).elf
+BINARY := demos-$(CONFIG_VERSION).$(CONFIG_ARCH).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(CONFIG_ARCHDIR)))

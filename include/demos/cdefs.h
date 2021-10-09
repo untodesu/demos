@@ -1,6 +1,7 @@
 #ifndef DEMOS_CDEFS_H
 #define DEMOS_CDEFS_H 1
 
+#define __aligned(x)    __attribute__((aligned(x)))
 #define __deprecated    __attribute__((deprecated))
 #define __optimize(x)   __attribute__((optimize(x)))
 #define __packed        __attribute__((packed))

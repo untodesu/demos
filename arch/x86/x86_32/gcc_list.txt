@@ -1,3 +1,0 @@
-i386-elf-gcc
-i386-unknown-elf-gcc
-gcc -m32

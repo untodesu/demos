@@ -3,7 +3,6 @@ include/config.h
 isoroot/boot/limine.cfg
 isoroot/boot/demos*.elf
 config.*.mk
-config.sh
 link.ld
 demos*.elf
 demos*.iso
