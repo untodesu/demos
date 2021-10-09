@@ -23,7 +23,7 @@ void init_i8253(void)
     uint16_t divisor = I8253_FREQ / I8253_SPEED;
     kprintf("i8253: initializing for %u Hz (d: %hu)\r\n", I8253_SPEED, divisor);
 
-    outb(I8253_CMD, 0x34); // CH0, rate generator, 16-bit binary
+    outb(I8253_CMD, 0x34); /* CH0, rate generator, 16-bit binary */
     outb(I8253_CH0, (divisor & 0x00FF));
     outb(I8253_CH0, (divisor & 0xFF00) >> 8);
 }

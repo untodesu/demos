@@ -10,7 +10,7 @@
 #define SEG_RING_0      (0 << 5)
 #define SEG_RING_3      (3 << 5)
 #define SEG_PRESENT     (1 << 7)
-#define SEG_FATTY       (1 << 3) // Hey hey hey!
+#define SEG_FATTY       (1 << 3) /* Hey hey hey! */
 #define SEG_32BIT       (1 << 2)
 #define SEG_64BIT       (1 << 1)
 
