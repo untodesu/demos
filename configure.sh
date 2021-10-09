@@ -18,14 +18,19 @@ function check_file {
     fi
 }
 
+clean_list=
+function add_clean {
+    clean_list="$clean_list $1"
+}
+
 conf_list=
 function add_conf {
     conf_list="$conf_list $1"
 }
 
-clean_list=
-function add_clean {
-    clean_list="$clean_list $1"
+def_list=
+function add_def {
+    def_list="$def_list;CONFIG_$1:=$2"
 }
 
 arch=
@@ -52,9 +57,6 @@ fi
 
 sh "$rootdir/tools/confc.sh" $conf_list > "$rootdir/include/config.h"
 sh "$rootdir/tools/confm.sh" $conf_list > "$rootdir/config.0.mk"
-sh "$rootdir/tools/confs.sh" $conf_list > "$rootdir/config.sh"
-
-source "$rootdir/config.sh"
 
 add_clean "$rootdir/include/config.h"
 add_clean "$rootdir/config.0.mk"
@@ -91,5 +93,8 @@ echo "CONFIG_CPFLAGS :="                                >> "$rootdir/config.1.mk
 echo "CONFIG_CPFLAGS += -I $rootdir/include"            >> "$rootdir/config.1.mk"
 echo "CONFIG_CPFLAGS += -I $archdir/include"            >> "$rootdir/config.1.mk"
 echo "CONFIG_CPFLAGS += -I $archroot/include"           >> "$rootdir/config.1.mk"
+for it in $(echo $def_list | sed "s/;/ /g"); do
+    echo "$it"                                          >> "$rootdir/config.1.mk"
+done
 
 exit 0
