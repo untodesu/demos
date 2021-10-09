@@ -92,12 +92,12 @@ void init_segment(void)
         "pushq $1f      \n"
         "retfq          \n"
         "1:             \n"
-        "mov %1, %%ax   \n"
-        "mov %%ax, %%ds \n"
-        "mov %%ax, %%es \n"
-        "mov %%ax, %%fs \n"
-        "mov %%ax, %%gs \n"
-        "mov %%ax, %%ss \n"
+        "movw %1,   %%ax\n"
+        "movw %%ax, %%ds\n"
+        "movw %%ax, %%es\n"
+        "movw %%ax, %%fs\n"
+        "movw %%ax, %%gs\n"
+        "movw %%ax, %%ss\n"
         :
         : "i"(SEG_SELECTOR(0, 0, SEG_INDEX_CODE64)), "i"(SEG_SELECTOR(0, 0, SEG_INDEX_DATA64))
     );
