@@ -1,8 +1,8 @@
-#include <config.h>
+#include <arch/vaddr.h>
 
 SECTIONS
 {
-    . = CONFIG_VIRTUAL_BASE + CONFIG_BASE_ADDRESS;
+    . = (KERNEL_VIRTUAL_BASE + KERNEL_LOAD_ADDRESS);
 
     .stivale2hdr ALIGN(4K) : {
         *(.stivale2hdr)

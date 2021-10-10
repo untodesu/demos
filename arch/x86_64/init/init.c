@@ -56,7 +56,7 @@ static struct stivale2_header_tag_framebuffer header_tag_0 = {
     .framebuffer_bpp = 0
 };
 
-__section(".bss") __aligned(16) static uint8_t boot_stack[CONFIG_BOOT_STACK_SIZE] = { 0 };
+__section(".bss") __aligned(16) static uint8_t boot_stack[X86_BOOT_STACK_SIZE] = { 0 };
 __section(".stivale2hdr") __used static struct stivale2_header header = {
     .entry_point = (uint64_t)(&init_arch),
     .stack = (uint64_t)(boot_stack + sizeof(boot_stack)),

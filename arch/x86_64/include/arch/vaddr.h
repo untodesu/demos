@@ -1,14 +1,13 @@
 #ifndef ARCH_VADDR_H
 #define ARCH_VADDR_H 1
-#include <config.h>
 
-#define phys_to_virt(x) ((x) + CONFIG_VIRTUAL_BASE)
-#define virt_to_phys(x) ((x) - CONFIG_VIRTUAL_BASE)
+#define KERNEL_VIRTUAL_BASE 0xFFFFFFFF80000000
+#define KERNEL_LOAD_ADDRESS 0x0000000000200000
 
 #if !defined(__ASSEMBLER__)
 #include <arch/stdint.h>
-typedef uintptr_t paddr_t;
-typedef uintptr_t vaddr_t;
+static inline uintptr_t phys_to_virt(uintptr_t x) { return x + KERNEL_VIRTUAL_BASE; }
+static inline uintptr_t virt_to_phys(uintptr_t x) { return x - KERNEL_VIRTUAL_BASE; }
 #endif
 
 #endif
