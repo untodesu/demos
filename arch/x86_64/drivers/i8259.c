@@ -1,8 +1,8 @@
 #include <arch/drivers/i8259.h>
 #include <arch/io.h>
 
-#define I8259_PORT_1 (0x20)
-#define I8259_PORT_2 (0xA0)
+#define I8259_PORT_1 0x20
+#define I8259_PORT_2 0xA0
 
 static uint16_t mask = 0xFFFF & ~(1 << 2);
 
@@ -29,7 +29,7 @@ void init_i8259(void)
     outb(I8259_PORT_2 + 1, (mask >> 8) & 0xFF);
 }
 
-void i8259_mask(uint8_t irq_no, bool set)
+void i8259_mask(uint8_t irq_no, int set)
 {
     uint16_t irq_bit = (1 << irq_no);
     uint16_t port = (irq_bit & 0xF0) ? I8259_PORT_2 : I8259_PORT_1;
@@ -45,13 +45,13 @@ void i8259_eoi(uint8_t irq_no)
     outb(I8259_PORT_1, 0x20);
 }
 
-bool get_i8259_irq(uint8_t int_no, uint8_t *irq_no)
+int get_i8259_irq(uint8_t int_no, uint8_t *irq_no)
 {
     if(int_no >= I8259_IRQ0 && int_no <= I8259_IRQ15) {
         if(irq_no)
             *irq_no = int_no - I8259_IRQ0;
-        return true;
+        return 1;
     }
 
-    return false;
+    return 0;
 }

@@ -27,12 +27,16 @@ static const void *find_tag(const struct stivale2_struct *st, uint64_t identifie
 
 static void __noreturn init_arch(const struct stivale2_struct *st)
 {
+    const void *terminal_tag;
+
     disable_interrupts();
 
     /* Relay kprintf calls to the Stivale2 terminal */
-    const void *terminal_tag = find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+    terminal_tag = find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID);
     if(terminal_tag && init_st2t(terminal_tag))
         set_kprintf_func(st2t_write);
+
+    kprintf("version %s\r\n", VERSION);
 
     init_interrupts();
     enable_interrupts();

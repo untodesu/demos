@@ -19,9 +19,10 @@ void kprintf(const char *fmt, ...)
 
 void kvprintf(const char *fmt, va_list va)
 {
+    int nc;
     if(kprintf_func) {
-        int nc = vsnprintf(kprintf_buffer, sizeof(kprintf_buffer), fmt, va);
-        if(nc > 0)
-            kprintf_func(kprintf_buffer, (size_t)nc);
+        if((nc = vsnprintf(kprintf_buffer, sizeof(kprintf_buffer), fmt, va)) <= 0)
+            return;
+        kprintf_func(kprintf_buffer, nc);
     }
 }

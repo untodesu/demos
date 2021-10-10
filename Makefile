@@ -1,7 +1,7 @@
 include ./config.0.mk
 include ./config.1.mk
 
-INTERNALCCFLAGS := -std=gnu99 -ffreestanding -O3 -Wall -Wextra
+INTERNALCCFLAGS := -std=gnu99 -ffreestanding -O3 -Wall -Wextra -pedantic -Werror
 INTERNALCPFLAGS := -nostdinc
 INTERNALLDFLAGS := -nostdlib -T ./link.ld
 

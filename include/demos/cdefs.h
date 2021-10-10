@@ -6,6 +6,7 @@
 #define __optimize(x)   __attribute__((optimize(x)))
 #define __packed        __attribute__((packed))
 #define __printf(x, y)  __attribute__((format(printf, x, y)))
+#define __unused        __attribute__((unused))
 #define __used          __attribute__((used))
 #define __section(x)    __attribute__((section(x)))
 #define __noreturn      __attribute__((noreturn))

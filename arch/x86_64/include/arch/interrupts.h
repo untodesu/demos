@@ -2,7 +2,6 @@
 #define ARCH_INTERRUPTS_H 1
 #include <arch/stdint.h>
 #include <demos/cdefs.h>
-#include <stdbool.h>
 
 struct interrupt_frame {
     uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
@@ -15,7 +14,7 @@ struct interrupt_frame {
 
 typedef void(*interrupt_handler_t)(struct interrupt_frame *);
 
-bool set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler);
+int set_interrupt_handler(uint8_t int_no, interrupt_handler_t handler);
 void init_interrupts(void);
 #define disable_interrupts() asm volatile("cli")
 #define enable_interrupts() asm volatile("sti")

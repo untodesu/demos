@@ -33,26 +33,44 @@ struct buffer {
 #define FLAGS_SIGNED    (1 << 5)
 #define FLAGS_UPPERCASE (1 << 6)
 
-#define ILEN_CHAR       0   /* hh */
-#define ILEN_SHORT      1   /* h  */
+#define ILEN_CHAR       0 /* hh */
+#define ILEN_SHORT      1 /* h  */
 #define ILEN_INT        2
-#define ILEN_LONG       3   /* l  */
-#define ILEN_DLONG      4   /* ll */
-#define ILEN_INTMAX_T   5   /* j  */
-#define ILEN_SIZE_T     6   /* z  */
-#define ILEN_PTRDIFF_T  7   /* t  */
+#define ILEN_LONG       3 /* l  */
+#define ILEN_DLONG      4 /* ll */
+#define ILEN_INTMAX_T   5 /* j  */
+#define ILEN_SIZE_T     6 /* z  */
+#define ILEN_PTRDIFF_T  7 /* t  */
 
-#define va_arg_ilen(ap, ilen, iv)                                               \
-    switch(ilen) {                                                              \
-        case ILEN_CHAR:         iv = va_arg(ap, unsigned int);          break;  \
-        case ILEN_SHORT:        iv = va_arg(ap, unsigned int);          break;  \
-        case ILEN_INT:          iv = va_arg(ap, unsigned int);          break;  \
-        case ILEN_LONG:         iv = va_arg(ap, unsigned long);         break;  \
-        case ILEN_DLONG:        iv = va_arg(ap, unsigned long long);    break;  \
-        case ILEN_INTMAX_T:     iv = va_arg(ap, uintmax_t);             break;  \
-        case ILEN_SIZE_T:       iv = va_arg(ap, size_t);                break;  \
-        case ILEN_PTRDIFF_T:    iv = va_arg(ap, ptrdiff_t);             break;  \
-        default:                iv = 0;                                 break;  \
+#define va_arg_ilen(ap, ilen, iv)                   \
+    switch(ilen) {                                  \
+        case ILEN_CHAR:                             \
+            iv = va_arg(ap, unsigned int);          \
+            break;                                  \
+        case ILEN_SHORT:                            \
+            iv = va_arg(ap, unsigned int);          \
+            break;                                  \
+        case ILEN_INT:                              \
+            iv = va_arg(ap, unsigned int);          \
+            break;                                  \
+        case ILEN_LONG:                             \
+            iv = va_arg(ap, unsigned long);         \
+            break;                                  \
+        case ILEN_DLONG:                            \
+            iv = va_arg(ap, unsigned long long);    \
+            break;                                  \
+        case ILEN_INTMAX_T:                         \
+            iv = va_arg(ap, uintmax_t);             \
+            break;                                  \
+        case ILEN_SIZE_T:                           \
+            iv = va_arg(ap, size_t);                \
+            break;                                  \
+        case ILEN_PTRDIFF_T:                        \
+            iv = va_arg(ap, ptrdiff_t);             \
+            break;                                  \
+        default:                                    \
+            iv = 0;                                 \
+            break;                                  \
     }
 
 #define de_sign(iv, sign, type) \
@@ -73,6 +91,7 @@ static inline size_t fmt_atoz(const char **fmt)
         value = (value * 10) + (**fmt - '0');
         (*fmt)++;
     }
+
     return value;
 }
 
@@ -88,23 +107,37 @@ static inline void buffer_write(struct buffer *buf, char c)
 static void buffer_write_int(struct buffer *buf, uintmax_t iv, int flags, size_t width, size_t precision, int ilen, int base)
 {
     const char *digits = (flags & FLAGS_UPPERCASE) ? "0123456789ABCDEF" : "0123456789abcdef";
+    char ibuf_data[96] = { 0 };
+    struct buffer ibuf = { .data = ibuf_data, .size = sizeof(ibuf_data), .pos = 0 };
+    char sign = 0, pad = (flags & FLAGS_ZEROPAD) ? '0' : ' ';
+    size_t ibuf_pos;
+
     if(base > MAX_BASE)
         base = MAX_BASE;
 
-    char _ibuf[96] = { 0 };
-    struct buffer i_buf = { _ibuf, sizeof(i_buf), 0 };
-    char sign = 0;
-    char pad = (flags & FLAGS_ZEROPAD) ? '0' : ' ';
-
     if(flags & FLAGS_SIGNED) {
         switch(ilen) {
-            case ILEN_CHAR:         de_sign(iv, sign, signed char);         break;
-            case ILEN_SHORT:        de_sign(iv, sign, signed short);        break;
-            case ILEN_INT:          de_sign(iv, sign, signed int);          break;
-            case ILEN_LONG:         de_sign(iv, sign, signed long);         break;
-            case ILEN_DLONG:        de_sign(iv, sign, signed long long);    break;
-            case ILEN_INTMAX_T:     de_sign(iv, sign, intmax_t);            break;
-            case ILEN_PTRDIFF_T:    de_sign(iv, sign, ptrdiff_t);           break;
+            case ILEN_CHAR:
+                de_sign(iv, sign, signed char);
+                break;
+            case ILEN_SHORT:
+                de_sign(iv, sign, signed short);
+                break;
+            case ILEN_INT:
+                de_sign(iv, sign, signed int);
+                break;
+            case ILEN_LONG:
+                de_sign(iv, sign, signed long);
+                break;
+            case ILEN_DLONG:
+                de_sign(iv, sign, signed long long);
+                break;
+            case ILEN_INTMAX_T:
+                de_sign(iv, sign, intmax_t);
+                break;
+            case ILEN_PTRDIFF_T:
+                de_sign(iv, sign, ptrdiff_t);
+                break;
         }
     }
 
@@ -116,68 +149,72 @@ static void buffer_write_int(struct buffer *buf, uintmax_t iv, int flags, size_t
     }
 
     do {
-        buffer_write(&i_buf, digits[iv % base]);
+        buffer_write(&ibuf, digits[iv % base]);
         iv /= base;
         if(precision)
             precision--;
     } while(iv > 0 || precision != 0);
 
     if(sign)
-        buffer_write(&i_buf, sign);
+        buffer_write(&ibuf, sign);
 
     if(flags & FLAGS_HASH) {
         if(!(flags & FLAGS_ZEROPAD)) {
-            if(base == 16) {
-                buffer_write(&i_buf, 'x');
-                buffer_write(&i_buf, '0');
-            }
-            if(base == 2) {
-                buffer_write(&i_buf, 'b');
-                buffer_write(&i_buf, '0');
+            switch(base) {
+                case 2:
+                    buffer_write(&ibuf, 'b');
+                    buffer_write(&ibuf, '0');
+                    break;
+                case 16:
+                    buffer_write(&ibuf, 'x');
+                    buffer_write(&ibuf, '0');
+                    break;
             }
         }
 
         if(base == 8)
-            buffer_write(&i_buf, '0');
+            buffer_write(&ibuf, '0');
     }
 
-    size_t i_buf_pos = i_buf.pos;
+    ibuf_pos = ibuf.pos;
     if(!(flags & FLAGS_LEFT)) {
-        while(i_buf.pos < width)
-            buffer_write(&i_buf, pad);
+        while(ibuf.pos < width)
+            buffer_write(&ibuf, pad);
 
         if((flags & FLAGS_HASH) && (flags & FLAGS_ZEROPAD)) {
-            if(base == 16) {
-                buffer_write(&i_buf, 'x');
-                buffer_write(&i_buf, '0');
-            }
-            if(base == 2) {
-                buffer_write(&i_buf, 'b');
-                buffer_write(&i_buf, '0');
+            switch(base) {
+                case 2:
+                    buffer_write(&ibuf, 'b');
+                    buffer_write(&ibuf, '0');
+                    break;
+                case 16:
+                    buffer_write(&ibuf, 'x');
+                    buffer_write(&ibuf, '0');
+                    break;
             }
         }
     }
 
-    if(i_buf.pos >= i_buf.size)
-        i_buf.pos = i_buf.size;
+    if(ibuf.pos >= ibuf.size)
+        ibuf.pos = ibuf.size;
     
-    while(i_buf.pos--)
-        buffer_write(buf, i_buf.data[i_buf.pos]);
+    while(ibuf.pos--)
+        buffer_write(buf, ibuf.data[ibuf.pos]);
 
     if(flags & FLAGS_LEFT) {
-        while(i_buf_pos < width) {
+        while(ibuf_pos < width) {
             buffer_write(buf, ' ');
-            i_buf_pos++;
+            ibuf_pos++;
         }
     }
 }
 
 static void buffer_write_str(struct buffer *buf, const char *str, int flags, size_t width, size_t precision)
 {
-    size_t length = precision ? strnlen(str, precision) : strlen(str);
+    size_t i, length = precision ? strnlen(str, precision) : strlen(str);
 
     if(!(flags & FLAGS_LEFT)) {
-        for(size_t i = length; i < width; i++)
+        for(i = length; i < width; i++)
             buffer_write(buf, ' ');
     }
 
@@ -185,16 +222,17 @@ static void buffer_write_str(struct buffer *buf, const char *str, int flags, siz
         buffer_write(buf, *str++);
 
     if(flags & FLAGS_LEFT) {
-        for(size_t i = length; i < width; i++)
+        for(i = length; i < width; i++)
             buffer_write(buf, ' ');
     }
 }
 
 int sprintf(char *s, const char *fmt, ...)
 {
+    int p;
     va_list ap;
     va_start(ap, fmt);
-    int p = vsnprintf(s, (size_t)-1, fmt, ap);
+    p = vsnprintf(s, (size_t)-1, fmt, ap);
     va_end(ap);
     return p;
 }
@@ -206,23 +244,28 @@ int vsprintf(char *s, const char *fmt, va_list ap)
 
 int snprintf(char *s, size_t n, const char *fmt, ...)
 {
+    int p;
     va_list ap;
     va_start(ap, fmt);
-    int p = vsnprintf(s, n, fmt, ap);
+    p = vsnprintf(s, n, fmt, ap);
     va_end(ap);
     return p;
 }
 
 int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 {
-    struct buffer buf = { s, n, 0 };
+    struct buffer buf = { .size = n, .data = s, .pos = 0 };
+    int flags, ilen;
+    size_t width, precision;
+    uintmax_t iv;
+
     while(*fmt) {
         if(*fmt != '%' || *++fmt == '%') {
             buffer_write(&buf, *fmt++);
             continue;
         }
 
-        int flags = 0;
+        flags = 0;
         while(is_flag(*fmt)) {
             switch(*fmt++) {
                 case '0':   flags |= FLAGS_ZEROPAD; break;
@@ -236,15 +279,15 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
         if((flags & FLAGS_ZEROPAD) && (flags & FLAGS_LEFT))
             flags &= ~FLAGS_ZEROPAD;
 
-        size_t width = fmt_atoz(&fmt);
+        width = fmt_atoz(&fmt);
+        precision = 0;
 
-        size_t precision = 0;
         if(*fmt == '.') {
             fmt++;
             precision = fmt_atoz(&fmt);
         }
 
-        int ilen = ILEN_INT;
+        ilen = ILEN_INT;
         switch(*fmt) {
             case 'h':   ilen = (*++fmt == 'h') ? ILEN_CHAR : ILEN_SHORT;    break;
             case 'l':   ilen = (*++fmt == 'l') ? ILEN_DLONG : ILEN_LONG;    break;
@@ -256,9 +299,10 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
         if(ilen != ILEN_INT && ilen != ILEN_SHORT && ilen != ILEN_LONG)
             fmt++;
 
-        uintmax_t iv = 0;
+        iv = 0;
         switch (*fmt) {
-            case 'd': case 'i':
+            case 'd':
+            case 'i':
                 flags |= FLAGS_SIGNED;
                 va_arg_ilen(ap, ilen, iv);
                 buffer_write_int(&buf, iv, flags, width, precision, ilen, 10);
@@ -302,7 +346,6 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
                 flags |= FLAGS_HASH;
                 flags |= FLAGS_UPPERCASE;
                 flags |= FLAGS_ZEROPAD;
-                /* sizeof(uintptr_t) is in bytes, one byte in hex contains 2 digits. */
                 buffer_write_int(&buf, (uintptr_t)va_arg(ap, void *), flags, sizeof(uintptr_t) * 2, precision, ILEN_INTMAX_T, 16);
                 break;
         }
