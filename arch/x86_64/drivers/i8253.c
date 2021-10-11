@@ -19,7 +19,7 @@ static void __interrupt i8253_irq_handler(__unused struct interrupt_frame *frame
     num_ticks++;
 
     if(num_ticks % I8253_SPEED == 0)
-        kprintf("i8253: %llus\r\n", num_ticks / I8253_SPEED);
+        kprintf("i8253: %llus", num_ticks / I8253_SPEED);
     
     i8259_mask(I8253_IRQ, 0);
 }
@@ -27,7 +27,7 @@ static void __interrupt i8253_irq_handler(__unused struct interrupt_frame *frame
 void init_i8253(void)
 {
     uint16_t divisor = (uint16_t)(I8253_FRQ / I8253_SPEED);
-    kprintf("i8253: initializing for %u Hz (d: %hu)\r\n", I8253_SPEED, divisor);
+    kprintf("i8253: initializing for %u Hz (d: %hu)", I8253_SPEED, divisor);
 
     /* I8253 (PIT) triggers IRQ0 on I8259 */
     i8259_mask(I8253_IRQ, 0);

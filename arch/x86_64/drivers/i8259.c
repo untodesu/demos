@@ -63,5 +63,5 @@ void i8259_send_eoi(unsigned int irq)
     }
 
     /* There's an imposter among us */
-    kprintf("i8259: warning: spurious IRQ %u\r\n", irq);
+    kprintf("i8259: warning: spurious IRQ %u", irq);
 }

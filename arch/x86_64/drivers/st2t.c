@@ -4,11 +4,10 @@
 typedef void(*st2t_write_t)(const void *s, uint64_t n);
 static st2t_write_t callback = NULL;
 
-int init_st2t(const void *tag)
+int init_st2t(const struct stivale2_struct_tag_terminal *tag)
 {
-    const struct stivale2_struct_tag_terminal *terminal = tag;
-    if(terminal && terminal->term_write) {
-        callback = (st2t_write_t)terminal->term_write;
+    if(tag && tag->term_write) {
+        callback = (st2t_write_t)tag->term_write;
         return 1;
     }
 

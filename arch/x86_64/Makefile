@@ -12,6 +12,7 @@ clean_list_root_y += $(ISOIMG)
 
 subdirs_y += drivers
 subdirs_y += init
+subdirs_y += mm
 subdirs_y += sys
 
 .phony: iso

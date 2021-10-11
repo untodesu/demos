@@ -2,6 +2,7 @@
 #include <drivers/i8259.h>
 #include <drivers/st2t.h>
 #include <lib/compiler.h>
+#include <mm/pmm.h>
 #include <sys/config.h>
 #include <sys/exceptions.h>
 #include <sys/interrupts.h>
@@ -38,12 +39,15 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     if(terminal_tag && init_st2t(terminal_tag))
         set_kprintf_func(st2t_write);
 
-    kprintf("version %s\r\n", VERSION);
+    kprintf("version %s", VERSION);
 
     init_interrupts();
     init_exceptions();
     init_i8259();
     enable_interrupts();
+
+    /* this panics */
+    init_pmm(NULL);
 
     init_i8253();
 

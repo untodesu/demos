@@ -1,4 +1,5 @@
 #include <lib/sprintf.h>
+#include <lib/string.h>
 #include <sys/kprintf.h>
 
 static char kprintf_buffer[1024] = { 0 };
@@ -23,6 +24,10 @@ void kvprintf(const char *fmt, va_list va)
     if(kprintf_func) {
         if((nc = vsnprintf(kprintf_buffer, sizeof(kprintf_buffer), fmt, va)) <= 0)
             return;
+        if((size_t)nc >= sizeof(kprintf_buffer) - 2)
+            nc = sizeof(kprintf_buffer) - 2;
+        kprintf_buffer[++nc] = '\n';
+        kprintf_buffer[++nc] = '\0';
         kprintf_func(kprintf_buffer, nc);
     }
 }
