@@ -1,7 +1,9 @@
-#include <config.h>
-#include <sys/drivers/i8253.h>
-#include <sys/drivers/st2t.h>
-#include <sys/compiler.h>
+#include <drivers/i8253.h>
+#include <drivers/i8259.h>
+#include <drivers/st2t.h>
+#include <lib/compiler.h>
+#include <sys/config.h>
+#include <sys/exceptions.h>
 #include <sys/interrupts.h>
 #include <sys/kprintf.h>
 #include <sys/segment.h>
@@ -39,6 +41,8 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     kprintf("version %s\r\n", VERSION);
 
     init_interrupts();
+    init_exceptions();
+    init_i8259();
     enable_interrupts();
 
     init_i8253();

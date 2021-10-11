@@ -12,9 +12,6 @@
 #define SEG_INDEX_CODE64 5
 #define SEG_INDEX_DATA64 6
 
-#define SEG_RING_0 0
-#define SEG_RING_3 3
-
 #define SEG_SELECTOR(index, ldt, ring) (((ring) & 4) | (((ldt) & 1) << 2) | (index) << 3)
 
 #endif

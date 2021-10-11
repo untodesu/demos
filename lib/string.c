@@ -1,5 +1,5 @@
-#include <ctype.h>
-#include <string.h>
+#include <lib/ctype.h>
+#include <lib/string.h>
 
 void *memset(void *s, int c, size_t n)
 {

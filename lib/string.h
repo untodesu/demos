@@ -1,6 +1,6 @@
-#ifndef __STRING_H__
-#define __STRING_H__ 1
-#include <stddef.h>
+#ifndef __LIB_STRING_H__
+#define __LIB_STRING_H__ 1
+#include <lib/stddef.h>
 
 void *memset(void *s, int c, size_t n);
 void *memcpy(void *a, const void *b, size_t n);

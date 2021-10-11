@@ -1,6 +1,6 @@
 #ifndef __SYS_PORTS_H__
 #define __SYS_PORTS_H__ 1
-#include <inttypes.h>
+#include <lib/inttypes.h>
 
 static inline void outb(uint16_t p, uint8_t v)
 {

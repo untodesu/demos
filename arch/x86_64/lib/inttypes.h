@@ -1,5 +1,5 @@
-#ifndef __INTTYPES_H__
-#define __INTTYPES_H__ 1
+#ifndef __LIB_INTTYPES_H__
+#define __LIB_INTTYPES_H__ 1
 
 /* UNDONE: this lacks virtually
  * anything except stdint.h part */

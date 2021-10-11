@@ -1,5 +1,5 @@
-#ifndef __STDDEF_H__
-#define __STDDEF_H__ 1
+#ifndef __LIB_STDDEF_H__
+#define __LIB_STDDEF_H__ 1
 
 #if !defined(NULL)
 #define NULL ((void *)(0))

@@ -1,4 +1,4 @@
-#include <sprintf.h>
+#include <lib/sprintf.h>
 #include <sys/kprintf.h>
 
 static char kprintf_buffer[1024] = { 0 };

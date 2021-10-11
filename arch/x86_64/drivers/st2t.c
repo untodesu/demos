@@ -1,4 +1,4 @@
-#include <sys/drivers/st2t.h>
+#include <drivers/st2t.h>
 #include <sys/stivale2.h>
 
 typedef void(*st2t_write_t)(const void *s, uint64_t n);

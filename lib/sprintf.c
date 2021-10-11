@@ -14,10 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <ctype.h>
-#include <inttypes.h>
-#include <sprintf.h>
-#include <string.h>
+#include <lib/ctype.h>
+#include <lib/inttypes.h>
+#include <lib/sprintf.h>
+#include <lib/string.h>
 
 struct buffer {
     char *data;

@@ -1,8 +1,8 @@
-#ifndef __SPRINTF_H__
-#define __SPRINTF_H__ 1
-#include <sys/compiler.h>
-#include <stdarg.h>
-#include <stddef.h>
+#ifndef __LIB_SPRINTF_H__
+#define __LIB_SPRINTF_H__ 1
+#include <lib/compiler.h>
+#include <lib/stdarg.h>
+#include <lib/stddef.h>
 
 int sprintf(char *s, const char *fmt, ...) __printf(2, 3);
 int vsprintf(char *s, const char *fmt, va_list va);

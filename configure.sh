@@ -38,8 +38,8 @@ check_dir "$archdir"
 check_file "$archdir/gcc_list.txt"
 check_file "$archdir/link.in.ld"
 
-"$rootdir/tools/defcon" -C "$rootdir/include/config.h"  -c "$rootdir/kernel.conf" "$rootdir/defcon.ini" "$archdir/defcon.ini"
-"$rootdir/tools/defcon" -M "$rootdir/config.0.mk"       -c "$rootdir/kernel.conf" "$rootdir/defcon.ini" "$archdir/defcon.ini"
+"$rootdir/tools/defcon" -C "$rootdir/sys/config.h"  -c "$rootdir/kernel.conf" "$rootdir/defcon.ini" "$archdir/defcon.ini"
+"$rootdir/tools/defcon" -M "$rootdir/config.0.mk"   -c "$rootdir/kernel.conf" "$rootdir/defcon.ini" "$archdir/defcon.ini"
 
 GCC="gcc"
 while IFS= read -r line; do
@@ -57,15 +57,15 @@ echo "ARCHDIR:=$archdir"                            >> "$rootdir/config.1.mk"
 echo "ROOTDIR:=$rootdir"                            >> "$rootdir/config.1.mk"
 echo "GCC:=$GCC"                                    >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST :="                           >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/include/config.h" >> "$rootdir/config.1.mk"
+echo "HARD_CLEAN_LIST += $rootdir/sys/config.h"     >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/config.0.mk"      >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/config.1.mk"      >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/link.ld"          >> "$rootdir/config.1.mk"
 echo "CPFLAGS :="                                   >> "$rootdir/config.1.mk"
-echo "CPFLAGS += -I $rootdir/include"               >> "$rootdir/config.1.mk"
-echo "CPFLAGS += -I $archdir/include"               >> "$rootdir/config.1.mk"
+echo "CPFLAGS += -I $rootdir"                       >> "$rootdir/config.1.mk"
+echo "CPFLAGS += -I $archdir"                       >> "$rootdir/config.1.mk"
 
-$GCC -nostdinc -I "$rootdir/include" -I "$archdir/include" -E -xc -D__ASSEMBLER__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
+$GCC -nostdinc -I "$rootdir" -I "$archdir" -E -xc -D__ASSEMBLER__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
 
 if [ -f "$archdir/configure.sh" ]; then
     source "$archdir/configure.sh"
