@@ -1,5 +1,5 @@
-#ifndef ARCH_SEGMENT_H
-#define ARCH_SEGMENT_H 1
+#ifndef __SYS_SEGMENT_H__
+#define __SYS_SEGMENT_H__ 1
 
 /* Stivale2 guarantees that the GDT
  * tha was set up by the bootloader

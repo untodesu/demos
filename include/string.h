@@ -1,6 +1,6 @@
-#ifndef STRING_H
-#define STRING_H 1
-#include <arch/stddef.h>
+#ifndef __STRING_H__
+#define __STRING_H__ 1
+#include <stddef.h>
 
 void *memset(void *s, int c, size_t n);
 void *memcpy(void *a, const void *b, size_t n);

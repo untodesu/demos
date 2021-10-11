@@ -1,5 +1,5 @@
-#include <arch/drivers/st2t.h>
-#include <arch/stivale2.h>
+#include <sys/drivers/st2t.h>
+#include <sys/stivale2.h>
 
 typedef void(*st2t_write_t)(const void *s, uint64_t n);
 static st2t_write_t callback = NULL;

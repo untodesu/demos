@@ -1,8 +1,8 @@
-#ifndef DEMOS_KPRINTF_H
-#define DEMOS_KPRINTF_H 1
-#include <arch/stdarg.h>
-#include <arch/stddef.h>
-#include <demos/cdefs.h>
+#ifndef __SYS_KPRINTF_H__
+#define __SYS_KPRINTF_H__ 1
+#include <stdarg.h>
+#include <stddef.h>
+#include <sys/compiler.h>
 
 typedef void(*kprintf_func_t)(const void *, size_t);
 

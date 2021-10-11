@@ -1,11 +1,11 @@
-#include <arch/drivers/i8253.h>
-#include <arch/drivers/st2t.h>
-#include <arch/interrupts.h>
-#include <arch/segment.h>
-#include <arch/stivale2.h>
 #include <config.h>
-#include <demos/cdefs.h>
-#include <demos/kprintf.h>
+#include <sys/drivers/i8253.h>
+#include <sys/drivers/st2t.h>
+#include <sys/compiler.h>
+#include <sys/interrupts.h>
+#include <sys/kprintf.h>
+#include <sys/segment.h>
+#include <sys/stivale2.h>
 
 static void __noreturn hang(void)
 {

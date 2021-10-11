@@ -1,6 +1,6 @@
-#ifndef ARCH_IO_H
-#define ARCH_IO_H 1
-#include <arch/stdint.h>
+#ifndef __SYS_PORTS_H__
+#define __SYS_PORTS_H__ 1
+#include <inttypes.h>
 
 static inline void outb(uint16_t p, uint8_t v)
 {

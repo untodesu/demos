@@ -1,8 +1,8 @@
-#include <arch/drivers/i8253.h>
-#include <arch/drivers/i8259.h>
-#include <arch/interrupts.h>
-#include <arch/io.h>
-#include <demos/kprintf.h>
+#include <sys/drivers/i8253.h>
+#include <sys/drivers/i8259.h>
+#include <sys/interrupts.h>
+#include <sys/kprintf.h>
+#include <sys/ports.h>
 
 #define I8253_FREQ  1193182
 #define I8253_CH0   0x40

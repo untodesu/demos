@@ -1,6 +1,6 @@
-#ifndef ARCH_DRIVERS_I8259_H
-#define ARCH_DRIVERS_I8259_H 1
-#include <arch/stdint.h>
+#ifndef __SYS_DRIVERS_I8259_H__
+#define __SYS_DRIVERS_I8259_H__ 1
+#include <inttypes.h>
 
 #define I8259_IRQ0  0x20
 #define I8259_IRQ8  0x28

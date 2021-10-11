@@ -1,8 +1,8 @@
-#ifndef STIVALE2_H
-#define STIVALE2_H 1
-#include <arch/stddef.h>
-#include <arch/stdint.h>
-#include <demos/cdefs.h>
+#ifndef __SYS_STIVALE2_H__
+#define __SYS_STIVALE2_H__ 1
+#include <inttypes.h>
+#include <stddef.h>
+#include <sys/compiler.h>
 
 /*
  * Copyright (c) 2019, 2020, 2021, mintsuki and contributors.

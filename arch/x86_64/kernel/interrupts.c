@@ -1,7 +1,7 @@
-#include <arch/drivers/i8259.h>
-#include <arch/interrupts.h>
-#include <arch/segment.h>
-#include <demos/cdefs.h>
+#include <sys/drivers/i8259.h>
+#include <sys/compiler.h>
+#include <sys/interrupts.h>
+#include <sys/segment.h>
 #include <string.h>
 
 #define IDT_TRAP    (15 << 0)

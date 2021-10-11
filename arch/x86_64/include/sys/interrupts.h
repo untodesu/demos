@@ -1,7 +1,7 @@
-#ifndef ARCH_INTERRUPTS_H
-#define ARCH_INTERRUPTS_H 1
-#include <arch/stdint.h>
-#include <demos/cdefs.h>
+#ifndef __SYS_IDT_H__
+#define __SYS_IDT_H__ 1
+#include <inttypes.h>
+#include <sys/compiler.h>
 
 struct interrupt_frame {
     uint64_t r15, r14, r13, r12, r11, r10, r9, r8;

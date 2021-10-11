@@ -1,5 +1,5 @@
-#include <demos/kprintf.h>
 #include <sprintf.h>
+#include <sys/kprintf.h>
 
 static char kprintf_buffer[1024] = { 0 };
 static kprintf_func_t kprintf_func = NULL;

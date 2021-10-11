@@ -1,5 +1,5 @@
-#include <arch/drivers/i8259.h>
-#include <arch/io.h>
+#include <sys/drivers/i8259.h>
+#include <sys/ports.h>
 
 #define I8259_PORT_1 0x20
 #define I8259_PORT_2 0xA0
