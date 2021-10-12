@@ -30,7 +30,7 @@ static inline int get_level_char(int level)
         case KLOG_DEBUG:
             return 'D';
         default:
-            return '?';
+            return 'U';
     }        
 }
 

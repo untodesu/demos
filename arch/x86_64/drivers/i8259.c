@@ -52,16 +52,17 @@ void i8259_mask(unsigned int irq, int set)
     outb(port + 1, (mask >> shift) & 0xFF);
 }
 
-void i8259_send_eoi(unsigned int irq)
+int i8259_send_eoi(unsigned int irq)
 {
     unsigned int bit = (1 << irq);
     if(read_isr() & bit) {
         if(bit & 0xF0)
             outb(I8259_PORT_2, 0x20);
         outb(I8259_PORT_1, 0x20);
-        return;
+        return 1;
     }
 
     /* There's an imposter among us */
     klog(KLOG_WARN, "i8259: spurious IRQ %u", irq);
+    return 0;
 }

@@ -9,25 +9,25 @@
 #define I8253_FRQ 1193182
 #define I8253_IRQ 0x00
 
-static uint64_t num_ticks = 0;
+static size_t num_ticks = 0;
 
 static void __interrupt i8253_irq_handler(__unused struct interrupt_frame *frame)
 {
-    i8259_send_eoi(I8253_IRQ);
-    i8259_mask(I8253_IRQ, 1);
-
-    num_ticks++;
-
-    if(num_ticks % I8253_SPEED == 0)
-        klog(KLOG_DEBUG, "i8253: %llus", num_ticks / I8253_SPEED);
-    
-    i8259_mask(I8253_IRQ, 0);
+    if(i8259_send_eoi(I8253_IRQ)) {
+        i8259_mask(I8253_IRQ, 1);
+        num_ticks++;
+        if(num_ticks % I8253_SPEED == 0)
+            klog(KLOG_DEBUG, "i8253: %zus", num_ticks / I8253_SPEED);  
+        i8259_mask(I8253_IRQ, 0);
+    }
 }
 
 void init_i8253(void)
 {
     uint16_t divisor = (uint16_t)(I8253_FRQ / I8253_SPEED);
     klog(KLOG_INFO, "i8253: initializing for %u Hz (d: %hu)", I8253_SPEED, divisor);
+
+    num_ticks = 0;
 
     /* I8253 (PIT) triggers IRQ0 on I8259 */
     i8259_mask(I8253_IRQ, 0);
@@ -39,7 +39,7 @@ void init_i8253(void)
     outb(I8253_CH0, (divisor & 0xFF00) >> 8);
 }
 
-uint64_t i8253_ticks(void)
+size_t i8253_ticks(void)
 {
     return num_ticks;
 }

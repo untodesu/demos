@@ -34,7 +34,8 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
 
     init_klog();
     set_klog_level(KLOG_DEBUG);
-    klog(KLOG_INFO, "version %s", VERSION);
+    klog(KLOG_INFO, "kernel version %s", VERSION);
+    klog(KLOG_INFO, "%s %s", st->bootloader_brand, st->bootloader_version);
 
     if(init_st2t(find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID))) {
         klog(KLOG_INFO, "klog: using st2t for early logging");
@@ -44,13 +45,12 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     init_interrupts();
     init_exceptions();
     init_i8259();
-    enable_interrupts();
 
-    /* this panics */
     init_pmm(find_tag(st, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
     init_i8253();
 
+    enable_interrupts();
     hang();
 }
 

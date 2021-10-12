@@ -11,12 +11,12 @@
 
 #if !defined(SIZE_T_DEFINED)
 #define SIZE_T_DEFINED 1
-typedef unsigned long long size_t;
+typedef unsigned long int size_t;
 #endif
 
 #if !defined(PTRDIFF_T_DEFINED)
 #define PTRDIFF_T_DEFINED 1
-typedef signed long long ptrdiff_t;
+typedef signed long int ptrdiff_t;
 #endif
 
 #endif
