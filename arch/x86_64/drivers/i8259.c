@@ -1,5 +1,5 @@
 #include <drivers/i8259.h>
-#include <sys/kprintf.h>
+#include <sys/klog.h>
 #include <sys/ports.h>
 
 #define I8259_PORT_1        0x20
@@ -63,5 +63,5 @@ void i8259_send_eoi(unsigned int irq)
     }
 
     /* There's an imposter among us */
-    kprintf("i8259: warning: spurious IRQ %u", irq);
+    klog(KLOG_WARN, "i8259: spurious IRQ %u", irq);
 }

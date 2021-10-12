@@ -6,7 +6,7 @@
 #include <sys/config.h>
 #include <sys/exceptions.h>
 #include <sys/interrupts.h>
-#include <sys/kprintf.h>
+#include <sys/klog.h>
 #include <sys/segment.h>
 #include <sys/stivale2.h>
 
@@ -30,16 +30,16 @@ static const void *find_tag(const struct stivale2_struct *st, uint64_t identifie
 
 static void __noreturn init_arch(const struct stivale2_struct *st)
 {
-    const void *terminal_tag;
-
     disable_interrupts();
 
-    /* Relay kprintf calls to the Stivale2 terminal */
-    terminal_tag = find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID);
-    if(terminal_tag && init_st2t(terminal_tag))
-        set_kprintf_func(st2t_write);
+    init_klog();
+    set_klog_level(KLOG_DEBUG);
+    klog(KLOG_INFO, "version %s", VERSION);
 
-    kprintf("version %s", VERSION);
+    if(init_st2t(find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID))) {
+        klog(KLOG_INFO, "klog: using st2t for early logging");
+        set_klog_print_func(&st2t_write);
+    }
 
     init_interrupts();
     init_exceptions();
@@ -47,7 +47,7 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     enable_interrupts();
 
     /* this panics */
-    init_pmm(NULL);
+    init_pmm(find_tag(st, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
     init_i8253();
 

@@ -1,2 +1,2 @@
-sources_y += kprintf.c
+sources_y += klog.c
 sources_y += panic.c
