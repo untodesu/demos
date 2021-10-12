@@ -40,7 +40,7 @@ static void klog_print(const struct klog_message *msg)
     static char print_buffer[2048] = { 0 };
     if(!klog_print_func || msg->level < klog_level || !msg->message[0])
         return;
-    if((nc = snprintf(print_buffer, sizeof(print_buffer), "[%c] %s\n", get_level_char(msg->level), msg->message)) <= 0)
+    if((nc = snprintf(print_buffer, sizeof(print_buffer), "[%c] %s\r\n", get_level_char(msg->level), msg->message)) <= 0)
         return;
     klog_print_func(print_buffer, nc);
 }
