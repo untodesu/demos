@@ -99,7 +99,6 @@ void init_pmm(const struct stivale2_struct_tag_memmap *tag)
 
     klog(KLOG_DEBUG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz);
     klog(KLOG_DEBUG, "pmm: memory: total=%zu KiB, used=%zu KiB", info.total_memory / 1024, info.used_memory / 1024);
-    klog(KLOG_INFO, "pmm: init done");
 }
 
 /* UNDONE: we can't alloc yet */

@@ -4,27 +4,26 @@ SECTIONS
 {
     . = (KERNEL_VIRTUAL_BASE + KERNEL_LOAD_ADDRESS);
 
-    .stivale2hdr ALIGN(4K) : {
-        *(.stivale2hdr)
-        *(.stivale2hdr.*)
-    }
-
-    .text ALIGN(4K) : {
+    .text ALIGN(4096) : {
         *(.text)
         *(.text.*)
     }
 
-    .data ALIGN(4K) : {
-        *(.data)
-        *(.data.*)
+    .stivale2hdr ALIGN(4096) : {
+        KEEP(*(.stivale2hdr))
     }
 
-    .rodata ALIGN(4K) : {
+    .rodata ALIGN(4096) : {
         *(.rodata)
         *(.rodata.*)
     }
 
-    .bss ALIGN(4K) : {
+    .data ALIGN(4096) : {
+        *(.data)
+        *(.data.*)
+    }
+
+    .bss ALIGN(4096) : {
         *(COMMON)
         *(.bss)
         *(.bss.*)

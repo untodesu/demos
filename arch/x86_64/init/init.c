@@ -72,6 +72,6 @@ __section(".bss") __aligned(16) static uint8_t boot_stack[X86_BOOT_STACK_SIZE] =
 __section(".stivale2hdr") __used static struct stivale2_header header = {
     .entry_point = (uint64_t)(&init_arch),
     .stack = (uint64_t)(boot_stack + sizeof(boot_stack)),
-    .flags = (1 << 1) | (1 << 2),
+    .flags = (1 << 1),
     .tags = (uint64_t)(&header_tag_0)
 };
