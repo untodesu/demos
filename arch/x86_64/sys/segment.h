@@ -2,9 +2,9 @@
 #define __SYS_SEGMENT_H__ 1
 
 /* Stivale2 guarantees that the GDT
- * tha was set up by the bootloader
+ * that was set up by the bootloader
  * would have at least the following
- * entries with these exact indices. */
+ * entries with these exact offsets. */
 #define SEG_INDEX_CODE16 1
 #define SEG_INDEX_DATA16 2
 #define SEG_INDEX_CODE32 3

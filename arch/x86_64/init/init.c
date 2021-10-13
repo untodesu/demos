@@ -4,7 +4,6 @@
 #include <lib/compiler.h>
 #include <mm/pmm.h>
 #include <sys/config.h>
-#include <sys/exceptions.h>
 #include <sys/interrupts.h>
 #include <sys/klog.h>
 #include <sys/segment.h>
@@ -43,7 +42,6 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     }
 
     init_interrupts();
-    init_exceptions();
     init_i8259();
 
     init_pmm(find_tag(st, STIVALE2_STRUCT_TAG_MEMMAP_ID));

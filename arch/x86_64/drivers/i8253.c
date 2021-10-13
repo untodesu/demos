@@ -11,7 +11,7 @@
 
 static size_t num_ticks = 0;
 
-static void __interrupt i8253_irq_handler(__unused struct interrupt_frame *frame)
+static void i8253_irq_handler(__unused struct interrupt_frame *frame)
 {
     if(i8259_send_eoi(I8253_IRQ)) {
         i8259_mask(I8253_IRQ, 1);
@@ -31,7 +31,7 @@ void init_i8253(void)
 
     /* I8253 (PIT) triggers IRQ0 on I8259 */
     i8259_mask(I8253_IRQ, 0);
-    set_interrupt_handler(I8259_IRQ(I8253_IRQ), (uintptr_t)(&i8253_irq_handler), 0);
+    set_interrupt_handler(I8259_IRQ(I8253_IRQ), &i8253_irq_handler);
 
     /* CH0, rate generator, 16-bit binary */
     outb(I8253_CMD, 0x34);
