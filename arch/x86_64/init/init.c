@@ -1,6 +1,6 @@
 #include <drivers/i8253.h>
 #include <drivers/i8259.h>
-#include <drivers/st2t.h>
+#include <drivers/console/vgacon.h>
 #include <lib/compiler.h>
 #include <mm/pmm.h>
 #include <sys/config.h>
@@ -36,10 +36,17 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     klog(KLOG_INFO, "kernel version %s", VERSION);
     klog(KLOG_INFO, "%s %s", st->bootloader_brand, st->bootloader_version);
 
+    if(init_vgacon(find_tag(st, STIVALE2_STRUCT_TAG_TEXTMODE_ID))) {
+        klog(KLOG_INFO, "klog: using textmode for early logging");
+        set_klog_print_func(&vgacon_write);
+    }
+
+#if 0
     if(init_st2t(find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID))) {
         klog(KLOG_INFO, "klog: using st2t for early logging");
         set_klog_print_func(&st2t_write);
     }
+#endif
 
     init_interrupts();
     init_i8259();
@@ -52,6 +59,7 @@ static void __noreturn init_arch(const struct stivale2_struct *st)
     hang();
 }
 
+#if 0
 static struct stivale2_header_tag_terminal header_tag_1 = {
     .tag.identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
     .tag.next = 0,
@@ -65,11 +73,12 @@ static struct stivale2_header_tag_framebuffer header_tag_0 = {
     .framebuffer_height = 0,
     .framebuffer_bpp = 0
 };
+#endif
 
 __section(".bss") __aligned(16) static uint8_t boot_stack[X86_BOOT_STACK_SIZE] = { 0 };
 __section(".stivale2hdr") __used static struct stivale2_header header = {
     .entry_point = (uint64_t)(&init_arch),
     .stack = (uint64_t)(boot_stack + sizeof(boot_stack)),
     .flags = (1 << 1),
-    .tags = (uint64_t)(&header_tag_0)
+    .tags = 0
 };
