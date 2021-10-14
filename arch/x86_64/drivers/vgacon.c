@@ -1,10 +1,11 @@
-#include <drivers/console/vgacon.h>
+#include <drivers/vgacon.h>
 #include <lib/ctype.h>
 #include <lib/string.h>
 #include <sys/ports.h>
 #include <sys/stivale2.h>
 
-#define VGA_CRTC                0x3D4
+#define VGA_CRTC 0x3D4
+
 #define VGA_CRTC_MAX_SCANLINE   0x09
 #define VGA_CRTC_CURSOR_START   0x0A
 #define VGA_CRTC_CURSOR_END     0x0B
@@ -92,7 +93,7 @@ void vgacon_write(const void *s, size_t n)
                     break;
             }
 
-            if((cursor / vgainfo.cols) >= lim) {
+            if((cursor / vgainfo.cols) > lim) {
                 for(i = 0; i < lim; i++)
                     memcpy(vidbuffer + i * vgainfo.cols, vidbuffer + (i + 1) * vgainfo.cols, sizeof(uint16_t) * vgainfo.cols);
                 fill16(vidbuffer + vgainfo.cols * lim, 0x0700, vgainfo.cols);

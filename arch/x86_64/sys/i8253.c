@@ -1,5 +1,5 @@
-#include <drivers/i8253.h>
-#include <drivers/i8259.h>
+#include <sys/i8253.h>
+#include <sys/i8259.h>
 #include <sys/interrupts.h>
 #include <sys/klog.h>
 #include <sys/ports.h>

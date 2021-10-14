@@ -1,5 +1,5 @@
-#ifndef __DRIVERS_CONSOLE_VGACON_H__
-#define __DRIVERS_CONSOLE_VGACON_H__ 1
+#ifndef __DRIVERS_VGACON_H__
+#define __DRIVERS_VGACON_H__ 1
 #include <lib/stddef.h>
 
 struct stivale2_struct_tag_textmode;

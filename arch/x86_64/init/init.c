@@ -1,23 +1,17 @@
-#include <drivers/i8253.h>
-#include <drivers/i8259.h>
-#include <drivers/console/vgacon.h>
+#include <drivers/vgacon.h>
 #include <lib/compiler.h>
 #include <mm/pmm.h>
 #include <sys/config.h>
+#include <sys/i8253.h>
+#include <sys/i8259.h>
 #include <sys/interrupts.h>
 #include <sys/klog.h>
-#include <sys/segment.h>
+#include <sys/panic.h>
 #include <sys/stivale2.h>
 
-static void __noreturn hang(void)
+static const void *find_st2_tag(const struct stivale2_struct *st2, uint64_t identifier)
 {
-    /* UNDONE: move this somewhere else. */
-    for(;;) asm volatile("hlt");
-}
-
-static const void *find_tag(const struct stivale2_struct *st, uint64_t identifier)
-{
-    const struct stivale2_tag *tag = (const void *)st->tags;
+    const struct stivale2_tag *tag = (const void *)st2->tags;
     while(tag) {
         if(tag->identifier == identifier)
             return tag;
@@ -27,58 +21,33 @@ static const void *find_tag(const struct stivale2_struct *st, uint64_t identifie
     return NULL;
 }
 
-static void __noreturn init_arch(const struct stivale2_struct *st)
+void __used __noreturn kstart(const struct stivale2_struct *st2)
 {
     disable_interrupts();
 
     init_klog();
     set_klog_level(KLOG_DEBUG);
-    klog(KLOG_INFO, "kernel version %s", VERSION);
-    klog(KLOG_INFO, "%s %s", st->bootloader_brand, st->bootloader_version);
+    klog(KLOG_INFO, "kernel version: %s", VERSION);
+    klog(KLOG_INFO, "bootloader: %s %s", st2->bootloader_brand, st2->bootloader_version);
 
-    if(init_vgacon(find_tag(st, STIVALE2_STRUCT_TAG_TEXTMODE_ID))) {
-        klog(KLOG_INFO, "klog: using textmode for early logging");
+    if(init_vgacon(find_st2_tag(st2, STIVALE2_STRUCT_TAG_TEXTMODE_ID)))
         set_klog_print_func(&vgacon_write);
-    }
-
-#if 0
-    if(init_st2t(find_tag(st, STIVALE2_STRUCT_TAG_TERMINAL_ID))) {
-        klog(KLOG_INFO, "klog: using st2t for early logging");
-        set_klog_print_func(&st2t_write);
-    }
-#endif
 
     init_interrupts();
-    init_i8259();
+    init_i8259();    
 
-    init_pmm(find_tag(st, STIVALE2_STRUCT_TAG_MEMMAP_ID));
+    init_pmm(find_st2_tag(st2, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
     init_i8253();
-
     enable_interrupts();
-    hang();
+
+    for(;;) asm volatile("hlt");
 }
 
-#if 0
-static struct stivale2_header_tag_terminal header_tag_1 = {
-    .tag.identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
-    .tag.next = 0,
-    .flags = 0
-};
-
-static struct stivale2_header_tag_framebuffer header_tag_0 = {
-    .tag.identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
-    .tag.next = (uint64_t)(&header_tag_1),
-    .framebuffer_width = 0,
-    .framebuffer_height = 0,
-    .framebuffer_bpp = 0
-};
-#endif
-
-__section(".bss") __aligned(16) static uint8_t boot_stack[X86_BOOT_STACK_SIZE] = { 0 };
-__section(".stivale2hdr") __used static struct stivale2_header header = {
-    .entry_point = (uint64_t)(&init_arch),
-    .stack = (uint64_t)(boot_stack + sizeof(boot_stack)),
+__section(".bss") __aligned(16) static uint8_t __boot_stack[X86_BOOT_STACK_SIZE] = { 0 };
+__section(".stivale2hdr") __used static struct stivale2_header __boot_header = {
+    .entry_point = (uint64_t)(&kstart),
+    .stack = (uint64_t)(__boot_stack + sizeof(__boot_stack)),
     .flags = (1 << 1),
     .tags = 0
 };

@@ -12,6 +12,6 @@ struct pmm_info {
 };
 
 void init_pmm(const struct stivale2_struct_tag_memmap *tag);
-void pmm_free(uintptr_t ptr, size_t num_pages);
+void pmm_free(uintptr_t addr, size_t num_pages);
 
 #endif

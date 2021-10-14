@@ -1,4 +1,4 @@
-#include <drivers/i8259.h>
+#include <sys/i8259.h>
 #include <sys/klog.h>
 #include <sys/ports.h>
 

@@ -1,4 +1,1 @@
-sources_y += i8253.c
-sources_y += i8259.c
-
-subdirs_y += console
+sources_y += vgacon.c

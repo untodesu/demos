@@ -1,5 +1,5 @@
-#ifndef __DRIVERS_I8253_H__
-#define __DRIVERS_I8253_H__ 1
+#ifndef __SYS_I8253_H__
+#define __SYS_I8253_H__ 1
 #include <lib/stddef.h>
 
 #define I8253_SPEED 14551

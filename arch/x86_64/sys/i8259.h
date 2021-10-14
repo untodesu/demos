@@ -1,5 +1,5 @@
-#ifndef __DRIVERS_I8259_H__
-#define __DRIVERS_I8259_H__ 1
+#ifndef __SYS_I8259_H__
+#define __SYS_I8259_H__ 1
 #include <lib/inttypes.h>
 
 #define I8259_IRQ(x) ((x) + 0x20)
