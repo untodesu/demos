@@ -1,4 +1,4 @@
-#include <sys/vaddr.h>
+#include <arch/vaddr.h>
 
 SECTIONS
 {
