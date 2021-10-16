@@ -1,5 +1,5 @@
 .vscode/
-sys/config.h
+include/demos/config.h
 isoroot/boot/limine.cfg
 isoroot/boot/demos*.elf
 config.*.mk
