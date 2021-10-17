@@ -1,3 +1,4 @@
+#include <arch/cpuid.h>
 #include <arch/i8253.h>
 #include <arch/i8259.h>
 #include <arch/interrupts.h>
@@ -34,6 +35,9 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
 
     init_interrupts();
     init_segment();
+
+    init_cpuid();
+    klog(KLOG_INFO, "%s", cpuid_get_vendor());
 
     panic("nothing to do!");
 }
