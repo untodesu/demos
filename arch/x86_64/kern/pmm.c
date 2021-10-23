@@ -103,19 +103,15 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
         }
 
         new_limit = entry->base + entry->length;
-        klog(KLOG_INFO, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
-
-        /* E820 (either from BIOS or from the bootloader) seems to map
-         * whatever starting from the true physical limit (say 128 MiB)
-         * to 4 GiB as RESERVED memory when running the kernel via QEMU. */
-        if(entry->type == STIVALE2_MMAP_RESERVED)
-            continue;
-
-        if(is_lma(new_limit))
-            continue;
-
-        if(new_limit > phys_limit)
+    
+        /* E820 data (either from the BIOS or from the bootloader)
+         * tends to have RESERVED entries at the end of the table
+         * that start at the true physical limit (say 128 MiB) and
+         * end at 4 GiB or whatever value BIOS decides to use. */
+        if(entry->type != STIVALE2_MMAP_RESERVED && new_limit > phys_limit)
             phys_limit = new_limit;
+
+        klog(KLOG_INFO, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
     }
 
     bitmap = NULL;
@@ -123,14 +119,11 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
     bsz = (total_pages / 32) * sizeof(uint32_t);
     for(i = 0; i < mmap->entries; i++) {
         entry = mmap->memmap + i;
-
-        new_limit = entry->base + entry->length;
-        if(is_lma(new_limit))
-            continue;
-
-        if(entry->type == STIVALE2_MMAP_USABLE && entry->length >= bsz) {
-            bitmap = (uint32_t *)(entry->base + MEMORY_VIRTUAL_BASE);
-            break;
+        if(!is_lma(entry->base + entry->length)) {
+            if(entry->type == STIVALE2_MMAP_USABLE && entry->length >= bsz) {
+                bitmap = (uint32_t *)(entry->base + MEMORY_VIRTUAL_BASE);
+                break;
+            }
         }
     }
 
@@ -139,15 +132,11 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
     used_pages = total_pages;
     for(i = 0; i < mmap->entries; i++) {
         entry = mmap->memmap + i;
-
-        new_limit = entry->base + entry->length;
-        if(is_lma(new_limit))
-            continue;
-
-        if(entry->type != STIVALE2_MMAP_USABLE)
-            continue;
-
-        pmfree((void *)(entry->base + MEMORY_VIRTUAL_BASE), calc_num_pages(entry->length));
+        if(!is_lma(entry->base + entry->length)) {
+            if(entry->type != STIVALE2_MMAP_USABLE)
+                continue;
+            pmfree((void *)(entry->base + MEMORY_VIRTUAL_BASE), calc_num_pages(entry->length));
+        }
     }
 
     bitmap_page = get_page((uintptr_t)bitmap - MEMORY_VIRTUAL_BASE);
