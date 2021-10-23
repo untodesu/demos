@@ -31,27 +31,16 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
     klog(KLOG_INFO, "kernel version %s", VERSION);
     klog(KLOG_INFO, "bootloader: %s %s", st2->bootloader_brand, st2->bootloader_version);
 
-    if(init_tmvga(find_st2_tag(st2, STIVALE2_STRUCT_TAG_TEXTMODE_ID)))
-        set_klog_print_func(&tmvga_write);
-
     init_interrupts();
     init_segment();
 
     init_pmm(find_st2_tag(st2, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
-    void *test4096 = kmalloc(4096);
-    klog(KLOG_DEBUG, "kmalloc(4096) = %p", test4096);
+    if(init_tmvga(find_st2_tag(st2, STIVALE2_STRUCT_TAG_TEXTMODE_ID)))
+        set_klog_print_func(&tmvga_write);
 
-    void *test8192 = kmalloc(8192);
-    klog(KLOG_DEBUG, "kmalloc(8192) = %p", test8192);
-
-    kmfree(test8192);
-    kmfree(test4096);
-
-    void *test12288 = kmalloc(12288);
-    klog(KLOG_DEBUG, "kmalloc(12288) = %p", test12288);
-
-    kmfree(test12288);
+    klog(KLOG_INFO, "color test 1: |\033[0;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m|");
+    klog(KLOG_INFO, "color test 2: |\033[1;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m|");
 
     panic("nothing to do!");
 }
