@@ -39,8 +39,12 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
     if(init_tmvga(find_st2_tag(st2, STIVALE2_STRUCT_TAG_TEXTMODE_ID)))
         set_klog_print_func(&tmvga_write);
 
-    klog(KLOG_INFO, "color test 1: |\033[0;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m|");
-    klog(KLOG_INFO, "color test 2: |\033[1;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m|");
+    klog(KLOG_INFO, "color test 1: \033[0;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
+    klog(KLOG_INFO, "color test 2: \033[1;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
 
-    panic("nothing to do!");
+    init_i8259();
+    init_i8253();
+
+    enable_interrupts();
+    for(;;) asm volatile("hlt");
 }

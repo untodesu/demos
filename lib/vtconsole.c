@@ -27,25 +27,26 @@ static void vt_clear(struct vtconsole *vt, int x0, int y0, int x1, int y1)
 
 static void vt_scroll(struct vtconsole *vt, int nl)
 {
-    int i, end;
+    int i, end_line, end_idx;
     struct vtconsole_cell *cell;
 
     if(nl > 0) {
         if(nl > vt->height)
             nl = vt->height;
-        end = vt->width * (vt->height - nl);
+        end_line = vt->height - nl;
+        end_idx = vt->width * end_line;
 
-        for(i = 0; i < end; i++) {
+        for(i = 0; i < end_idx; i++) {
             cell = vt->buffer + i;
             memcpy(cell, cell + vt->width, sizeof(struct vtconsole_cell));
             vtcallback_invoke(vt->on_paint, vt, cell, i % vt->width, i / vt->width);
         }
 
         for(i = 0; i < vt->width; i++) {
-            cell = vt->buffer + i + vt->width * end;
+            cell = vt->buffer + i + end_idx;
             cell->attrib = default_attrib;
             cell->ch = 0;
-            vtcallback_invoke(vt->on_paint, vt, cell, i % vt->width, i / vt->width);
+            vtcallback_invoke(vt->on_paint, vt, cell, i, end_line);
         }
 
         vt->cursor.y -= nl;
@@ -68,7 +69,7 @@ static void vt_newline(struct vtconsole *vt)
     vtcallback_invoke(vt->on_cursor, vt, &vt->cursor);
 }
 
-static void vtprint(struct vtconsole *vt, int c)
+static void vt_print(struct vtconsole *vt, int c)
 {
     int i, scratch;
     struct vtconsole_cell *cell;
@@ -83,7 +84,7 @@ static void vtprint(struct vtconsole *vt, int c)
         case '\t':
             scratch = 4 - (vt->cursor.x % 8);
             for(i = 0; i < scratch; i++)
-                vtprint(vt, ' ');
+                vt_print(vt, ' ');
             break;
         case '\b':
             if(vt->cursor.x >= 1) {
@@ -239,7 +240,7 @@ static void vtconsole_putchar(struct vtconsole *vt, int c)
 
     if(vt->parser.state == VTCONSOLE_STATE_ESCAPE) {
         if(c != 033) {
-            vtprint(vt, c);
+            vt_print(vt, c);
             goto done;
         }
 
@@ -254,7 +255,7 @@ static void vtconsole_putchar(struct vtconsole *vt, int c)
         if(c != '[') {
             vt->parser.priv = 0;
             vt->parser.state = VTCONSOLE_STATE_ESCAPE;
-            vtprint(vt, c);
+            vt_print(vt, c);
             goto done;
         }
 
