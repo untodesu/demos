@@ -203,7 +203,7 @@ struct stivale2_struct_tag_epoch {
     uint64_t epoch;
 } __packed;
 
-#define STIVALE2_FIRMWARE_BIOS 1 << 0
+#define STIVALE2_FIRMWARE_BIOS (1 << 0)
 struct stivale2_struct_tag_firmware {
     struct stivale2_tag tag;
     uint64_t flags;

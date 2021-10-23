@@ -1,5 +1,6 @@
 #include <arch/vaddr.h>
 
+ENTRY(_start)
 SECTIONS
 {
     . = (KERNEL_VIRTUAL_BASE + KERNEL_LOAD_ADDRESS);

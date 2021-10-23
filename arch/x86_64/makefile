@@ -12,7 +12,6 @@ clean_list_root_y += $(ISOIMG)
 
 subdirs_y += boot
 subdirs_y += kern
-subdirs_y += mm
 
 .phony: iso
 

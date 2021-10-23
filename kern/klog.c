@@ -16,31 +16,13 @@ static unsigned int klog_end = 0;
 static struct klog_message klog_buf[KLOG_BUFFER_SIZE] = { 0 };
 static klog_print_func_t klog_print_func = NULL;
 
-static inline int get_level_char(int level)
-{
-    switch(level) {
-        case KLOG_INFO:
-            return 'I';
-        case KLOG_WARN:
-            return 'W';
-        case KLOG_ERROR:
-            return 'E';
-        case KLOG_FATAL:
-            return '!';
-        case KLOG_DEBUG:
-            return 'D';
-        default:
-            return 'U';
-    }        
-}
-
 static void klog_print(const struct klog_message *msg)
 {
     int nc;
     static char print_buffer[2048] = { 0 };
     if(!klog_print_func || msg->level < klog_level || !msg->message[0])
         return;
-    if((nc = snprintf(print_buffer, sizeof(print_buffer), "[%c] %s\r\n", get_level_char(msg->level), msg->message)) <= 0)
+    if((nc = snprintf(print_buffer, sizeof(print_buffer), "%s\r\n", msg->message)) <= 0)
         return;
     klog_print_func(print_buffer, nc);
 }
