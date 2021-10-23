@@ -11,7 +11,7 @@ static struct vtconsole_attrib default_attrib = {
     .fore = VTCONSOLE_COLOR_GRAY
 };
 
-static void vtclear(struct vtconsole *vt, int x0, int y0, int x1, int y1)
+static void vt_clear(struct vtconsole *vt, int x0, int y0, int x1, int y1)
 {
     int i, beg, end;
     struct vtconsole_cell *cell;
@@ -149,13 +149,13 @@ static void vt_csi_ed(struct vtconsole *vt)
         attrib = 0;
     switch(attrib) {
         case 0:
-            vtclear(vt, vt->cursor.x, vt->cursor.y, vt->width, vt->height - 1);
+            vt_clear(vt, vt->cursor.x, vt->cursor.y, vt->width, vt->height - 1);
             break;
         case 1:
-            vtclear(vt, 0, 0, vt->cursor.x, vt->cursor.y);
+            vt_clear(vt, 0, 0, vt->cursor.x, vt->cursor.y);
             break;
         case 2:
-            vtclear(vt, 0, 0, vt->width, vt->height - 1);
+            vt_clear(vt, 0, 0, vt->width, vt->height - 1);
             break;
     }
 }
@@ -169,13 +169,13 @@ static void vt_csi_el(struct vtconsole *vt)
         attrib = 0;
     switch(attrib) {
         case 0:
-            vtclear(vt, vt->cursor.x, vt->cursor.y, vt->width, vt->cursor.y);
+            vt_clear(vt, vt->cursor.x, vt->cursor.y, vt->width, vt->cursor.y);
             break;
         case 1:
-            vtclear(vt, 0, vt->cursor.y, vt->cursor.x, vt->cursor.y);
+            vt_clear(vt, 0, vt->cursor.y, vt->cursor.x, vt->cursor.y);
             break;
         case 2:
-            vtclear(vt, 0, vt->cursor.y, vt->width, vt->cursor.y);
+            vt_clear(vt, 0, vt->cursor.y, vt->width, vt->cursor.y);
             break;
     }
 }
@@ -356,7 +356,7 @@ void init_vtconsole(struct vtconsole *vt, int width, int height, vtconsole_curso
     vt->on_cursor = on_cursor;
     vt->on_paint = on_paint;
     vt->on_misc_csi = on_misc_csi;
-    vtclear(vt, 0, 0, vt->width, vt->height - 1);
+    vt_clear(vt, 0, 0, vt->width, vt->height - 1);
 }
 
 void shutdown_vtconsole(struct vtconsole *vt)

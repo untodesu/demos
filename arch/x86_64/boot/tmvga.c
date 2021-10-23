@@ -98,6 +98,7 @@ static void misc_csi_callback(struct vtconsole *vt, int c)
 {
     uint8_t csr;
 
+    /* VT220 show/hide cursor sequences */
     if(vt->parser.priv == '?' && vt->parser.stack_map[0] && vt->parser.stack[0] == 25) {
         outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
         csr = inb(VGA_CRTC_IO + 1);
