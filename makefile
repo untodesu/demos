@@ -38,7 +38,7 @@ BINARY := demos-$(VERSION).$(ARCH).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(ARCHDIR)))
-$(eval $(call add_subdir,kern))
+$(eval $(call add_subdir,kernel))
 $(eval $(call add_subdir,lib))
 
 OBJECTS := $(SOURCES:=.o)
