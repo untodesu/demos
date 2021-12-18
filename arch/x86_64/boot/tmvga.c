@@ -1,9 +1,9 @@
 #include <arch/io.h>
+#include <demos/km.h>
 #include <ctype.h>
 #include <stivale2.h>
 #include <string.h>
-#include <vterm.h>
-#include <demos/km.h>
+#include <libvterm.h>
 
 #define VGA_CSR_CURSOR_DISABLE (1 << 5)
 
