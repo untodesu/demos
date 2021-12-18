@@ -2,7 +2,8 @@
 #include <ctype.h>
 #include <stivale2.h>
 #include <string.h>
-#include <vtconsole.h>
+#include <vterm.h>
+#include <demos/km.h>
 
 #define VGA_CSR_CURSOR_DISABLE (1 << 5)
 
@@ -30,80 +31,41 @@
 #define VGA_COLOR_LIGHT_YELLOW  0x0E
 #define VGA_COLOR_WHITE         0x0F
 
-static struct vtconsole vt = { 0 };
+static struct vterm vt = { 0 };
 static uint16_t *vidbuffer = NULL;
 
 static const uint8_t colormap[8] = {
-    [VTCONSOLE_COLOR_BLACK]     = VGA_COLOR_BLACK,
-    [VTCONSOLE_COLOR_RED]       = VGA_COLOR_RED,
-    [VTCONSOLE_COLOR_GREEN]     = VGA_COLOR_GREEN,
-    [VTCONSOLE_COLOR_YELLOW]    = VGA_COLOR_BROWN,
-    [VTCONSOLE_COLOR_BLUE]      = VGA_COLOR_BLUE,
-    [VTCONSOLE_COLOR_MAGENTA]   = VGA_COLOR_MAGENTA,
-    [VTCONSOLE_COLOR_CYAN]      = VGA_COLOR_CYAN,
-    [VTCONSOLE_COLOR_GRAY]      = VGA_COLOR_LIGHT_GRAY
+    [VTERM_COLOR_BLK] = VGA_COLOR_BLACK,
+    [VTERM_COLOR_RED] = VGA_COLOR_RED,
+    [VTERM_COLOR_GRN] = VGA_COLOR_GREEN,
+    [VTERM_COLOR_YLW] = VGA_COLOR_BROWN,
+    [VTERM_COLOR_BLU] = VGA_COLOR_BLUE,
+    [VTERM_COLOR_MAG] = VGA_COLOR_MAGENTA,
+    [VTERM_COLOR_CYN] = VGA_COLOR_CYAN,
+    [VTERM_COLOR_WHT] = VGA_COLOR_LIGHT_GRAY
 };
 
 static const uint8_t colormap_b[8] = {
-    [VTCONSOLE_COLOR_BLACK]     = VGA_COLOR_BLACK,
-    [VTCONSOLE_COLOR_RED]       = VGA_COLOR_LIGHT_RED,
-    [VTCONSOLE_COLOR_GREEN]     = VGA_COLOR_LIGHT_GREEN,
-    [VTCONSOLE_COLOR_YELLOW]    = VGA_COLOR_LIGHT_YELLOW,
-    [VTCONSOLE_COLOR_BLUE]      = VGA_COLOR_LIGHT_BLUE,
-    [VTCONSOLE_COLOR_MAGENTA]   = VGA_COLOR_LIGHT_MAGENTA,
-    [VTCONSOLE_COLOR_CYAN]      = VGA_COLOR_LIGHT_CYAN,
-    [VTCONSOLE_COLOR_GRAY]      = VGA_COLOR_WHITE
+    [VTERM_COLOR_BLK] = VGA_COLOR_BLACK,
+    [VTERM_COLOR_RED] = VGA_COLOR_LIGHT_RED,
+    [VTERM_COLOR_GRN] = VGA_COLOR_LIGHT_GREEN,
+    [VTERM_COLOR_YLW] = VGA_COLOR_LIGHT_YELLOW,
+    [VTERM_COLOR_BLU] = VGA_COLOR_LIGHT_BLUE,
+    [VTERM_COLOR_MAG] = VGA_COLOR_LIGHT_MAGENTA,
+    [VTERM_COLOR_CYN] = VGA_COLOR_LIGHT_CYAN,
+    [VTERM_COLOR_WHT] = VGA_COLOR_WHITE
 };
 
-static void paint_callback(struct vtconsole *vt, const struct vtconsole_cell *cell, int x, int y)
-{
-    const uint8_t *swap_colormap;
-    const uint8_t *back_colormap = colormap;
-    const uint8_t *fore_colormap = colormap;
-    int back_idx, fore_idx;
-    uint16_t word;
-
-    if(cell->attrib.flags & VTCONSOLE_FLAG_BOLD)
-        fore_colormap = colormap_b;
-
-    if(cell->attrib.flags & VTCONSOLE_FLAG_INVERT) {
-        swap_colormap = fore_colormap;
-        fore_colormap = back_colormap;
-        back_colormap = swap_colormap;
-        fore_idx = cell->attrib.back;
-        back_idx = cell->attrib.fore;
-    }
-    else {
-        fore_idx = cell->attrib.fore;
-        back_idx = cell->attrib.back;
-    }
-
-    word = 0;
-    word |= (back_colormap[back_idx] & 0x0F) << 12;
-    word |= (fore_colormap[fore_idx] & 0x0F) << 8;
-    word |= (cell->ch & 0xFF);
-    vidbuffer[y * vt->width + x] = word;
-}
-
-static void cursor_callback(struct vtconsole *vt, const struct vtconsole_cursor *cursor)
-{
-    unsigned int pos = cursor->y * vt->width + cursor->x;
-    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_HI);
-    outb(VGA_CRTC_IO + 1, (pos >> 8) & 0xFF);
-    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_LO);
-    outb(VGA_CRTC_IO + 1, pos & 0xFF);
-}
-
-static void misc_csi_callback(struct vtconsole *vt, int c)
+static void on_misc_sequence(const struct vterm *vt, int chr)
 {
     uint8_t csr;
 
     /* VT220 show/hide cursor sequences */
-    if(vt->parser.priv == '?' && vt->parser.stack_map[0] && vt->parser.stack[0] == 25) {
+    if(vt->parser.prefix_chr == '?' && vt->parser.argv_map[0] && vt->parser.argv_val[0] == 25) {
         outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
         csr = inb(VGA_CRTC_IO + 1);
 
-        switch(c) {
+        switch(chr) {
             case 'h':
                 csr &= ~VGA_CSR_CURSOR_DISABLE;
                 break;
@@ -116,13 +78,59 @@ static void misc_csi_callback(struct vtconsole *vt, int c)
     }
 }
 
+static void on_set_cursor(const struct vterm *vt, const struct vterm_cursor *cursor)
+{
+    unsigned int pos = cursor->y * vt->mode.scr_w + cursor->x;
+    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_HI);
+    outb(VGA_CRTC_IO + 1, (pos >> 8) & 0xFF);
+    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_LO);
+    outb(VGA_CRTC_IO + 1, pos & 0xFF);
+}
+
+static void on_draw_cell(const struct vterm *vt, int chr, unsigned int x, unsigned int y, const struct vterm_attrib *attrib)
+{
+    const uint8_t *swap_colormap;
+    const uint8_t *back_colormap = colormap;
+    const uint8_t *fore_colormap = colormap;
+    int back_idx, fore_idx;
+    uint16_t word;
+
+    if(attrib->attr & VTERM_ATTR_BOLD)
+        fore_colormap = colormap_b;
+
+    if(attrib->attr & VTERM_ATTR_INVERT) {
+        swap_colormap = fore_colormap;
+        fore_colormap = back_colormap;
+        back_colormap = swap_colormap;
+        fore_idx = attrib->bg;
+        back_idx = attrib->fg;
+    }
+    else {
+        fore_idx = attrib->fg;
+        back_idx = attrib->bg;
+    }
+
+    word = 0;
+    word |= (back_colormap[back_idx] & 0x0F) << 12;
+    word |= (fore_colormap[fore_idx] & 0x0F) << 8;
+    word |= (chr & 0xFF);
+    vidbuffer[y * vt->mode.scr_w + x] = word;
+}
+
 int init_tmvga(const struct stivale2_struct_tag_textmode *tag)
 {
     uint8_t endc;
+    struct vterm_callbacks callbacks;
 
     if(tag) {
         vidbuffer = (uint16_t *)tag->address;
-        init_vtconsole(&vt, (int)tag->cols, (int)tag->rows, &cursor_callback, &paint_callback, &misc_csi_callback);
+
+        callbacks.mem_alloc = &kmalloc;
+        callbacks.mem_free = &kmfree;
+        callbacks.misc_sequence = &on_misc_sequence;
+        callbacks.set_cursor = &on_set_cursor;
+        callbacks.draw_cell = &on_draw_cell;
+        vterm_init(&vt, &callbacks, NULL);
 
         endc = 0;
         outb(VGA_CRTC_IO, VGA_CRTC_MAX_SCANLINE);
@@ -142,7 +150,7 @@ int init_tmvga(const struct stivale2_struct_tag_textmode *tag)
     return 0;
 }
 
-void tmvga_write(const void __unused *s, size_t __unused n)
+void tmvga_write(const void *s, size_t n)
 {
-    vtconsole_write(&vt, s, n);
+    vterm_write(&vt, s, n);
 }

@@ -41,6 +41,7 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
 
     klog(KLOG_INFO, "color test 1: \033[0;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
     klog(KLOG_INFO, "color test 2: \033[1;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
+    klog(KLOG_INFO, "\033[2CTE\vST!");
 
     init_i8259();
     init_i8253();

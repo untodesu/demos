@@ -11,7 +11,7 @@ clean_list_root_y += $(ISOCFG)
 clean_list_root_y += $(ISOIMG)
 
 subdirs_y += boot
-subdirs_y += kern
+subdirs_y += kernel
 
 .phony: iso
 
