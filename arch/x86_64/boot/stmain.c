@@ -1,10 +1,10 @@
+#include <config.h>
 #include <arch/i8253.h>
 #include <arch/i8259.h>
 #include <arch/interrupts.h>
 #include <arch/pmm.h>
 #include <arch/segment.h>
 #include <demos/compiler.h>
-#include <demos/config.h>
 #include <demos/klog.h>
 #include <demos/km.h>
 #include <demos/panic.h>

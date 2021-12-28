@@ -1,4 +1,4 @@
-#include <demos/config.h>
+#include <config.h>
 #include <demos/klog.h>
 #include <sprintf.h>
 #include <string.h>
