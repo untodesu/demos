@@ -36,14 +36,14 @@ if [ -z "$2" ]; then
     log "(!!!) argv[2] not present, defaulting host=$host"
 else
     host="$2"
-    chk_dir "$root_dir/$host"
     log "setting host=$host"
 fi
 
-bindir="./bin/$host"
+bindir="./tools/$host"
 archdir="./arch/$arch"
 rootdir="."
 
+chk_dir "$bindir"
 chk_dir "$archdir"
 chk_file "$archdir/gcc_list.txt"
 chk_file "$archdir/link.in.ld"
