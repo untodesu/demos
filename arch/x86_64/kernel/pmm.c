@@ -90,7 +90,7 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
                 entry_type_s = "bad memory";
                 break;
             case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
-                entry_type_s = "bootloader reclaim";
+                entry_type_s = "boot reclaim";
                 break;
             case STIVALE2_MMAP_KERNEL_AND_MODULES:
                 entry_type_s = "kernel";
