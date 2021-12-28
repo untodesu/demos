@@ -16,13 +16,48 @@ static unsigned int klog_end = 0;
 static struct klog_message klog_buf[KLOG_BUFFER_SIZE] = { 0 };
 static klog_print_func_t klog_print_func = NULL;
 
+static const char *klog_get_prefix(int level)
+{
+    static char str[32] = { 0 };
+    unsigned int color;
+    const char *prefix;
+    switch(level) {
+        case KLOG_INFO:
+            color = 92;
+            prefix = "INF";
+            break;
+        case KLOG_WARN:
+            color = 93;
+            prefix = "WRN";
+            break;
+        case KLOG_ERROR:
+            color = 91;
+            prefix = "ERR";
+            break;
+        case KLOG_FATAL:
+            color = 91;
+            prefix = "FTL";
+            break;
+        case KLOG_DEBUG:
+            color = 37;
+            prefix = "DBG";
+            break;
+        default:
+            color = 95;
+            prefix = "???";
+            break;
+    }
+    snprintf(str, sizeof(str), "\033[%um[%3s]\033[0m ", color, prefix);
+    return str;
+}
+
 static void klog_print(const struct klog_message *msg)
 {
     int nc;
     static char print_buffer[2048] = { 0 };
     if(!klog_print_func || msg->level < klog_level || !msg->message[0])
         return;
-    if((nc = snprintf(print_buffer, sizeof(print_buffer), "%s\r\n", msg->message)) <= 0)
+    if((nc = snprintf(print_buffer, sizeof(print_buffer), "%s%s\r\n", klog_get_prefix(msg->level), msg->message)) <= 0)
         return;
     klog_print_func(print_buffer, nc);
 }

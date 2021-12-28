@@ -1,5 +1,5 @@
-#ifndef _ARCH_SEGMENT_H_
-#define _ARCH_SEGMENT_H_ 1
+#ifndef _ARCH_SEG_H_
+#define _ARCH_SEG_H_ 1
 
 #define SEG_INDEX_NULL_NULL 0
 #define SEG_INDEX_KERN_CODE 1
@@ -10,7 +10,7 @@
 #define SEG_SELECTOR(index, ldt, ring) (((ring) & 4) | (((ldt) & 1) << 2) | (index) << 3)
 
 #if !defined(__ASSEMBLER__)
-void init_segment(void);
+void setup_gdt(void);
 #endif
 
 #endif

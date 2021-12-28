@@ -1,6 +1,6 @@
 #include <arch/i8253.h>
 #include <arch/i8259.h>
-#include <arch/interrupts.h>
+#include <arch/intr.h>
 #include <arch/io.h>
 #include <demos/klog.h>
 
@@ -34,9 +34,9 @@ void init_i8253(void)
     set_interrupt_handler(I8259_IRQ(I8253_IRQ), &i8253_irq_handler);
 
     /* CH0, rate generator, 16-bit binary */
-    outb(I8253_CMD, 0x34);
-    outb(I8253_CH0, (divisor & 0x00FF));
-    outb(I8253_CH0, (divisor & 0xFF00) >> 8);
+    io_write8(I8253_CMD, 0x34);
+    io_write8(I8253_CH0, (divisor & 0x00FF));
+    io_write8(I8253_CH0, (divisor & 0xFF00) >> 8);
 }
 
 size_t i8253_ticks(void)

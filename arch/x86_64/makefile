@@ -1,4 +1,5 @@
 CCFLAGS += -fno-pic -mcmodel=kernel -mno-3dnow -mno-80387 -mno-mmx -mno-red-zone -mno-sse -mno-sse2
+CPFLAGS += -D__X86_64__=1
 LDFLAGS += -fno-pie -Wl,-static,--no-dynamic-linker,-ztext -z max-page-size=0x1000
 
 ISOBIN := $(ARCHDIR)/root/boot/$(BINARY)
@@ -23,7 +24,7 @@ $(ISOIMG): $(ISOBIN) $(ISOCFG)
 			--efi-boot limine-eltorito-efi.bin							\
 			-efi-boot-part --efi-boot-image --protective-msdos-label	\
 			$(ARCHDIR)/root -o $(ISOIMG)
-	$(ARCHDIR)/tools/limine-install $(ISOIMG)
+	$(BINDIR)/limine-install $(ISOIMG)
 
 $(ISOBIN): $(BINARY)
 	cp $(BINARY) $(ISOBIN)

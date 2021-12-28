@@ -1,4 +1,4 @@
-#include <arch/segment.h>
+#include <arch/seg.h>
 #include <demos/klog.h>
 #include <inttypes.h>
 #include <string.h>
@@ -39,7 +39,7 @@ void set_entry(uint8_t id, uint8_t flags)
     memcpy(gdt + id, &entry, sizeof(entry));
 }
 
-void init_segment(void)
+void setup_gdt(void)
 {
     uint8_t code_flags = SEG_READWRITE | SEG_NONSYSTEM | SEG_EXECUTABLE;
     uint8_t data_flags = SEG_READWRITE | SEG_NONSYSTEM;

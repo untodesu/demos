@@ -62,8 +62,8 @@ static void on_misc_sequence(const struct vterm *vt, int chr)
 
     /* VT220 show/hide cursor sequences */
     if(vt->parser.prefix_chr == '?' && vt->parser.argv_map[0] && vt->parser.argv_val[0] == 25) {
-        outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
-        csr = inb(VGA_CRTC_IO + 1);
+        io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
+        csr = io_read8(VGA_CRTC_IO + 1);
 
         switch(chr) {
             case 'h':
@@ -74,17 +74,17 @@ static void on_misc_sequence(const struct vterm *vt, int chr)
                 break;
         }
 
-        outb(VGA_CRTC_IO + 1, csr);
+        io_write8(VGA_CRTC_IO + 1, csr);
     }
 }
 
 static void on_set_cursor(const struct vterm *vt, const struct vterm_cursor *cursor)
 {
     unsigned int pos = cursor->y * vt->mode.scr_w + cursor->x;
-    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_HI);
-    outb(VGA_CRTC_IO + 1, (pos >> 8) & 0xFF);
-    outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_LO);
-    outb(VGA_CRTC_IO + 1, pos & 0xFF);
+    io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_HI);
+    io_write8(VGA_CRTC_IO + 1, (pos >> 8) & 0xFF);
+    io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_LOC_LO);
+    io_write8(VGA_CRTC_IO + 1, pos & 0xFF);
 }
 
 static void on_draw_cell(const struct vterm *vt, int chr, unsigned int x, unsigned int y, const struct vterm_attrib *attrib)
@@ -95,7 +95,7 @@ static void on_draw_cell(const struct vterm *vt, int chr, unsigned int x, unsign
     int back_idx, fore_idx;
     uint16_t word;
 
-    if(attrib->attr & VTERM_ATTR_BOLD)
+    if((attrib->attr & VTERM_ATTR_BOLD) || (attrib->attr & VTERM_ATTR_BRIGHT))
         fore_colormap = colormap_b;
 
     if(attrib->attr & VTERM_ATTR_INVERT) {
@@ -133,15 +133,15 @@ int init_tmvga(const struct stivale2_struct_tag_textmode *tag)
         vterm_init(&vt, &callbacks, NULL);
 
         endc = 0;
-        outb(VGA_CRTC_IO, VGA_CRTC_MAX_SCANLINE);
-        endc |= inb(VGA_CRTC_IO + 1) & 0x1F;
-        outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_END);
-        endc |= inb(VGA_CRTC_IO + 1) & 0xE0;
+        io_write8(VGA_CRTC_IO, VGA_CRTC_MAX_SCANLINE);
+        endc |= io_read8(VGA_CRTC_IO + 1) & 0x1F;
+        io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_END);
+        endc |= io_read8(VGA_CRTC_IO + 1) & 0xE0;
 
-        outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
-        outb(VGA_CRTC_IO + 1, inb(VGA_CRTC_IO + 1) & 0xE0);
-        outb(VGA_CRTC_IO, VGA_CRTC_CURSOR_END);
-        outb(VGA_CRTC_IO + 1, endc);
+        io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_START);
+        io_write8(VGA_CRTC_IO + 1, io_read8(VGA_CRTC_IO + 1) & 0xE0);
+        io_write8(VGA_CRTC_IO, VGA_CRTC_CURSOR_END);
+        io_write8(VGA_CRTC_IO + 1, endc);
 
         return 1;
     }

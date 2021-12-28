@@ -2,54 +2,55 @@
 #define _ARCH_IO_H_ 1
 #include <inttypes.h>
 
-static inline void io_wait(void)
+/* TODO list:
+ * [x]  remake the legacy io  in a better way
+ *      so we don't use actual instruction names:
+ *      outb -> io_write8 with throttled counterparts.
+ * [ ]  more io_throttle compatibility. not sure if
+ *      it's really needed but linux seems to cover
+ *      more cases where hardware misbehaves: the port 0x80
+ *      may be taken on some IBM PC clones because there
+ *      WAS and IS not a single standard about io throttling.
+ * [ ]  memory-mapped io along with acpi table parsing.
+ */
+
+#define IO_LEGACY_IN8   "inb"
+#define IO_LEGACY_IN16  "inw"
+#define IO_LEGACY_IN32  "inl"
+#define IO_LEGACY_OUT8  "outb"
+#define IO_LEGACY_OUT16 "outw"
+#define IO_LEGACY_OUT32 "outl"
+
+typedef uint16_t    io_addr_t;
+typedef uint8_t     io_uint8_t;
+typedef uint16_t    io_uint16_t;
+typedef uint32_t    io_uint32_t;
+
+static inline void io_throttle(void)
 {
-    asm volatile("outb %0, $0x80"::"a"(0));
+    asm volatile("outb %0, $0x80"::"a"((io_uint8_t)0));
 }
 
-#define _declare_inx(t, f)                                  \
-    static inline t in##f(uint16_t p)                       \
-    {                                                       \
-        t v;                                                \
-        asm volatile("in"#f" %1, %0":"=a"(v):"Nd"(p));      \
-        return v;                                           \
-    }
+/* build legacy x86 io read functions */
+#define _io_build_legacy_read(bits) \
+    static inline io_uint##bits##_t io_read##bits(io_addr_t addr) \
+    {io_uint##bits##_t val;asm volatile(IO_LEGACY_IN##bits" %1,%0":"=a"(val):"Nd"(addr));return val;}\
+    static inline io_uint##bits##_t io_read##bits##_throttle(io_addr_t addr) \
+    {io_uint##bits##_t val=io_read##bits(addr);io_throttle();return val;}
 
-#define _declare_inxw(t, f)                                 \
-    static inline t in##f##w(uint16_t p)                    \
-    {                                                       \
-        t v;                                                \
-        asm volatile("in"#f" %1, %0":"=a"(v):"Nd"(p));      \
-        io_wait();                                          \
-        return v;                                           \
-    }
+/* build legacy x86 io write functions */
+#define _io_build_legacy_write(bits) \
+    static inline void io_write##bits(io_addr_t addr, io_uint##bits##_t val) \
+    {asm volatile(IO_LEGACY_OUT##bits" %0,%1"::"a"(val),"Nd"(addr));} \
+    static inline void io_write##bits##_throttle(io_addr_t addr, io_uint##bits##_t val) \
+    {io_write##bits(addr, val);io_throttle();}
 
-#define _declare_outx(t, f)                                 \
-    static inline void out##f(uint16_t p, t v)              \
-    {                                                       \
-        asm volatile("out"#f" %0, %1"::"a"(v), "Nd"(p));    \
-    }
+_io_build_legacy_read(8)
+_io_build_legacy_read(16)
+_io_build_legacy_read(32)
 
-#define _declare_outxw(t, f)                                \
-    static inline void out##f##w(uint16_t p, t v)           \
-    {                                                       \
-        asm volatile("out"#f" %0, %1"::"a"(v), "Nd"(p));    \
-        io_wait();                                          \
-    }
-
-_declare_inx(uint8_t,       b)
-_declare_inxw(uint8_t,      b)
-_declare_outx(uint8_t,      b)
-_declare_outxw(uint8_t,     b)
-
-_declare_inx(uint16_t,      w)
-_declare_inxw(uint16_t,     w)
-_declare_outx(uint16_t,     w)
-_declare_outxw(uint16_t,    w)
-
-_declare_inx(uint32_t,      l)
-_declare_inxw(uint32_t,     l)
-_declare_outx(uint32_t,     l)
-_declare_outxw(uint32_t,    l)
+_io_build_legacy_write(8)
+_io_build_legacy_write(16)
+_io_build_legacy_write(32)
 
 #endif

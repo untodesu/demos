@@ -1,9 +1,9 @@
 #include <config.h>
 #include <arch/i8253.h>
 #include <arch/i8259.h>
-#include <arch/interrupts.h>
+#include <arch/intr.h>
 #include <arch/pmm.h>
-#include <arch/segment.h>
+#include <arch/seg.h>
 #include <demos/compiler.h>
 #include <demos/klog.h>
 #include <demos/km.h>
@@ -31,24 +31,17 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
     klog(KLOG_INFO, "kernel version %s", VERSION);
     klog(KLOG_INFO, "bootloader: %s %s", st2->bootloader_brand, st2->bootloader_version);
 
+    setup_gdt();
     init_interrupts();
-    init_segment();
 
     init_pmm(find_st2_tag(st2, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
     if(init_tmvga(find_st2_tag(st2, STIVALE2_STRUCT_TAG_TEXTMODE_ID)))
         set_klog_print_func(&tmvga_write);
 
-    klog(KLOG_INFO, "color test 1: \033[0;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
-    klog(KLOG_INFO, "color test 2: \033[1;7m\033[30;47m    \033[31m    \033[32m    \033[33m    \033[34m    \033[35m    \033[36m    \033[37m    \033[0m");
-    klog(KLOG_INFO, "\033[2CTE\vST!");
-    klog(KLOG_INFO, "\033[3C......");
-    klog(KLOG_INFO, "\033[3C.TEST.");
-    klog(KLOG_INFO, "\033[3C......");
-
     init_i8259();
     init_i8253();
 
-    enable_interrupts();
+    cpu_enable_interrupts();
     for(;;) asm volatile("hlt");
 }

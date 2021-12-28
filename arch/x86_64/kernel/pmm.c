@@ -52,7 +52,7 @@ static inline int is_lma(uintptr_t addr)
 
 void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
 {
-    size_t bsz, total_kib;
+    size_t bsz, free_kib, total_kib;
     uint64_t i;
     uintptr_t new_limit;
     pm_page_t bitmap_page;
@@ -67,6 +67,7 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
 
     phys_limit = 0;
     total_pages = 0;
+    total_kib = 0;
     used_pages = 0;
 
     for(i = 0; i < mmap->entries; i++) {
@@ -80,7 +81,7 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
                 entry_type_s = "reserved";
                 break;
             case STIVALE2_MMAP_ACPI_RECLAIMABLE:
-                entry_type_s = "ACPI";
+                entry_type_s = "ACPI reclaim";
                 break;
             case STIVALE2_MMAP_ACPI_NVS:
                 entry_type_s = "ACPI NVS";
@@ -89,7 +90,7 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
                 entry_type_s = "bad memory";
                 break;
             case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
-                entry_type_s = "bootloader";
+                entry_type_s = "bootloader reclaim";
                 break;
             case STIVALE2_MMAP_KERNEL_AND_MODULES:
                 entry_type_s = "kernel";
@@ -108,8 +109,10 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
          * tends to have RESERVED entries at the end of the table
          * that start at the true physical limit (say 128 MiB) and
          * end at 4 GiB or whatever value BIOS decides to use. */
-        if(entry->type != STIVALE2_MMAP_RESERVED && new_limit > phys_limit)
+        if(entry->type != STIVALE2_MMAP_RESERVED && entry->type != STIVALE2_MMAP_KERNEL_AND_MODULES && new_limit > phys_limit) {
+            total_kib += entry->length;
             phys_limit = new_limit;
+        }
 
         klog(KLOG_INFO, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
     }
@@ -144,9 +147,10 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
 
     alloc_tmp = 0;
 
-    total_kib = (total_pages * PAGE_SIZE) / 1024;
-    klog(KLOG_DEBUG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz);
-    klog(KLOG_DEBUG, "pmm: %zu KiB (%zu MiB)", total_kib, total_kib / 1024);
+    free_kib = (total_pages - used_pages) * PAGE_SIZE / 1024;
+    total_kib /= 1024;
+    klog(KLOG_DEBUG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz / sizeof(uint32_t));
+    klog(KLOG_DEBUG, "pmm: %zu/%zu KiB (%zu/%zu MiB) free/usable", free_kib, total_kib, free_kib / 1024, total_kib / 1024);
 }
 
 void *pmalloc(size_t num_pages)

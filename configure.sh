@@ -62,6 +62,7 @@ command -v $GCC_X > /dev/null || die "gcc not found"
 
 truncate -s 0 $rootdir/config.1.mk
 echo "ARCH:=$arch"                                  >> "$rootdir/config.1.mk"
+echo "BINDIR:=$bindir"                              >> "$rootdir/config.1.mk"
 echo "ARCHDIR:=$archdir"                            >> "$rootdir/config.1.mk"
 echo "ROOTDIR:=$rootdir"                            >> "$rootdir/config.1.mk"
 echo "GCC:=$GCC_X"                                  >> "$rootdir/config.1.mk"

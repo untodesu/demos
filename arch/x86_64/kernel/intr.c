@@ -1,5 +1,5 @@
-#include <arch/interrupts.h>
-#include <arch/segment.h>
+#include <arch/intr.h>
+#include <arch/seg.h>
 #include <demos/klog.h>
 #include <string.h>
 

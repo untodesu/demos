@@ -1,4 +1,4 @@
-#include <arch/halt.h>
+#include <arch/cpu.h>
 #include <demos/klog.h>
 #include <demos/panic.h>
 #include <sprintf.h>
@@ -14,5 +14,5 @@ void __noreturn panic(const char *fmt, ...)
 
     klog(KLOG_FATAL, "kernel panic: %s", buffer);
 
-    arch_halt();
+    cpu_brick();
 }
