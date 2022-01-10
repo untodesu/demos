@@ -1,6 +1,6 @@
-#ifndef _KLOG_H_
-#define _KLOG_H_ 1
-#include <demos/compiler.h>
+#ifndef _SYS_KLOG_H_
+#define _SYS_KLOG_H_ 1
+#include <sys/compiler.h>
 #include <stdarg.h>
 #include <stddef.h>
 

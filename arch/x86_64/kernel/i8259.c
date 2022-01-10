@@ -1,6 +1,6 @@
 #include <arch/i8259.h>
 #include <arch/io.h>
-#include <demos/klog.h>
+#include <sys/klog.h>
 
 #define I8259_PORT_1        0x20
 #define I8259_PORT_2        0xA0

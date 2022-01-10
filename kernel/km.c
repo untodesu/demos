@@ -1,5 +1,5 @@
 #include <arch/pmm.h>
-#include <demos/km.h>
+#include <sys/km.h>
 
 struct km_info {
     size_t bytes;

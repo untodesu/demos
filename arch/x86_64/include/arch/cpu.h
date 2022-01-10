@@ -1,7 +1,7 @@
 #ifndef _ARCH_CPU_H_
 #define _ARCH_CPU_H_ 1
-#include <demos/compiler.h>
-#include <inttypes.h>
+#include <sys/compiler.h>
+#include <stdint.h>
 
 struct interrupt_frame {
     uint64_t r15, r14, r13, r12, r11, r10, r9, r8;

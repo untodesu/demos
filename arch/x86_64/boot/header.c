@@ -1,5 +1,5 @@
 #include <config.h>
-#include <demos/compiler.h>
+#include <sys/compiler.h>
 #include <stivale2.h>
 
 static struct stivale2_tag __header_tag_0 = {

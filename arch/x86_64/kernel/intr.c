@@ -1,6 +1,6 @@
 #include <arch/intr.h>
 #include <arch/seg.h>
-#include <demos/klog.h>
+#include <sys/klog.h>
 #include <string.h>
 
 #define IDT_TRAP    (15 << 0)

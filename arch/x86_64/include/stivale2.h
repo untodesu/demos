@@ -25,8 +25,8 @@
  */
 #ifndef _STIVALE2_H_
 #define _STIVALE2_H_ 1
-#include <demos/compiler.h>
-#include <inttypes.h>
+#include <sys/compiler.h>
+#include <stdint.h>
 #include <stddef.h>
 
 /* Anchor for non ELF kernels. */

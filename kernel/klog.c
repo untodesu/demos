@@ -1,5 +1,5 @@
 #include <config.h>
-#include <demos/klog.h>
+#include <sys/klog.h>
 #include <sprintf.h>
 #include <string.h>
 

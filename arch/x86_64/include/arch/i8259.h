@@ -1,6 +1,6 @@
 #ifndef _ARCH_I8259_H_
 #define _ARCH_I8259_H_ 1
-#include <inttypes.h>
+#include <stdint.h>
 
 #define I8259_IRQ(x) ((x) + 0x20)
 

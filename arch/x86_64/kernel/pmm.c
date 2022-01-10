@@ -1,7 +1,7 @@
 #include <arch/pmm.h>
-#include <demos/compiler.h>
-#include <demos/klog.h>
-#include <demos/panic.h>
+#include <sys/compiler.h>
+#include <sys/klog.h>
+#include <sys/panic.h>
 #include <stivale2.h>
 #include <string.h>
 

@@ -1,6 +1,6 @@
 #ifndef _SPRINTF_H_
 #define _SPRINTF_H_ 1
-#include <demos/compiler.h>
+#include <sys/compiler.h>
 #include <stdarg.h>
 #include <stddef.h>
 

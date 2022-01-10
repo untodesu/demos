@@ -1,5 +1,5 @@
-#ifndef _DEMOS_COMPILER_H_
-#define _DEMOS_COMPILER_H_ 1
+#ifndef _SYS_COMPILER_H_
+#define _SYS_COMPILER_H_ 1
 
 #define __aligned(x)    __attribute__((aligned(x)))
 #define __deprecated    __attribute__((deprecated))

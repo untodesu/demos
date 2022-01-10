@@ -1,6 +1,6 @@
 #include <arch/seg.h>
-#include <demos/klog.h>
-#include <inttypes.h>
+#include <sys/klog.h>
+#include <stdint.h>
 #include <string.h>
 
 #define SEG_READWRITE   (1 << 1)

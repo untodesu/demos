@@ -1,28 +1,28 @@
 #ifndef _CTYPE_H_
 #define _CTYPE_H_ 1
 
-#define CTYPE_UC 0x01
-#define CTYPE_LC 0x02
-#define CTYPE_DD 0x04
-#define CTYPE_CN 0x08
-#define CTYPE_PT 0x10
-#define CTYPE_WS 0x20
-#define CTYPE_XD 0x40
-#define CTYPE_HS 0x80
+#define _CTYPE_UC 0x01
+#define _CTYPE_LC 0x02
+#define _CTYPE_DD 0x04
+#define _CTYPE_CN 0x08
+#define _CTYPE_PT 0x10
+#define _CTYPE_WS 0x20
+#define _CTYPE_XD 0x40
+#define _CTYPE_HS 0x80
 
-extern unsigned char ctype[];
+extern unsigned char _ctype[];
 
-#define isalnum(c)  (ctype[(c) + 1] & (CTYPE_UC | CTYPE_LC | CTYPE_DD))
-#define isalpha(c)  (ctype[(c) + 1] & (CTYPE_UC | CTYLE_LC))
-#define iscntrl(c)  (ctype[(c) + 1] & (CTYPE_CN))
-#define isdigit(c)  (ctype[(c) + 1] & (CTYPE_DD))
-#define isgraph(c)  (ctype[(c) + 1] & (CTYPE_PT | CTYPE_UC | CTYPE_LC | CTYPE_DD))
-#define islower(c)  (ctype[(c) + 1] & (CTYPE_LC))
-#define isprint(c)  (ctype[(c) + 1] & (CTYPE_PT | CTYPE_UC | CTYPE_LC | CTYPE_DD | CTYPE_HS))
-#define ispunct(c)  (ctype[(c) + 1] & (CTYPE_PT))
-#define isspace(c)  (ctype[(c) + 1] & (CTYPE_WS))
-#define isupper(c)  (ctype[(c) + 1] & (CTYPE_UC))
-#define isxdigit(c) (ctype[(c) + 1] & (CTYPE_DD | CTYPE_XD))
+#define isalnum(c)  (_ctype[(c) + 1] & (_CTYPE_UC | _CTYPE_LC | _CTYPE_DD))
+#define isalpha(c)  (_ctype[(c) + 1] & (_CTYPE_UC | _CTYPE_LC))
+#define iscntrl(c)  (_ctype[(c) + 1] & (_CTYPE_CN))
+#define isdigit(c)  (_ctype[(c) + 1] & (_CTYPE_DD))
+#define isgraph(c)  (_ctype[(c) + 1] & (_CTYPE_PT | _CTYPE_UC | _CTYPE_LC | _CTYPE_DD))
+#define islower(c)  (_ctype[(c) + 1] & (_CTYPE_LC))
+#define isprint(c)  (_ctype[(c) + 1] & (_CTYPE_PT | _CTYPE_UC | _CTYPE_LC | _CTYPE_DD | _CTYPE_HS))
+#define ispunct(c)  (_ctype[(c) + 1] & (_CTYPE_PT))
+#define isspace(c)  (_ctype[(c) + 1] & (_CTYPE_WS))
+#define isupper(c)  (_ctype[(c) + 1] & (_CTYPE_UC))
+#define isxdigit(c) (_ctype[(c) + 1] & (_CTYPE_DD | _CTYPE_XD))
 
 int isascii(int c);
 int toascii(int c);

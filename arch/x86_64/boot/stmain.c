@@ -4,10 +4,10 @@
 #include <arch/intr.h>
 #include <arch/pmm.h>
 #include <arch/seg.h>
-#include <demos/compiler.h>
-#include <demos/klog.h>
-#include <demos/km.h>
-#include <demos/panic.h>
+#include <sys/compiler.h>
+#include <sys/klog.h>
+#include <sys/km.h>
+#include <sys/panic.h>
 #include <stivale2.h>
 
 #include "tmvga.h"

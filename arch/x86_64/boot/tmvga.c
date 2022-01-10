@@ -1,5 +1,5 @@
 #include <arch/io.h>
-#include <demos/km.h>
+#include <sys/km.h>
 #include <ctype.h>
 #include <stivale2.h>
 #include <string.h>

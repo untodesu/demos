@@ -1,6 +1,6 @@
 #ifndef _ARCH_IO_H_
 #define _ARCH_IO_H_ 1
-#include <inttypes.h>
+#include <stdint.h>
 
 /* TODO list:
  * [x]  remake the legacy io  in a better way

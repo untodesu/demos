@@ -15,8 +15,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <ctype.h>
-#include <inttypes.h>
 #include <sprintf.h>
+#include <stdint.h>
 #include <string.h>
 
 struct buffer {

@@ -2,7 +2,7 @@
 #include <arch/i8259.h>
 #include <arch/intr.h>
 #include <arch/io.h>
-#include <demos/klog.h>
+#include <sys/klog.h>
 
 #define I8253_CH0 0x40
 #define I8253_CMD 0x43

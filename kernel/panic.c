@@ -1,6 +1,6 @@
 #include <arch/cpu.h>
-#include <demos/klog.h>
-#include <demos/panic.h>
+#include <sys/klog.h>
+#include <sys/panic.h>
 #include <sprintf.h>
 
 void __noreturn panic(const char *fmt, ...)
