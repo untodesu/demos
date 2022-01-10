@@ -1,12 +1,12 @@
 .vscode/
-include/demos/config.h
+include/delta/config.h
 isoroot/boot/limine.cfg
-isoroot/boot/demos*.elf
+isoroot/boot/delta*.elf
 defcon.ini
 config.*.mk
 link.ld
-demos*.elf
-demos*.iso
+delta*.elf
+delta*.iso
 *.c.o
 *.S.o
 *.s.o

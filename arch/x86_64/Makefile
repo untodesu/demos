@@ -5,7 +5,7 @@ LDFLAGS += -fno-pie -Wl,-static,--no-dynamic-linker,-ztext -z max-page-size=0x10
 ISOBIN := $(ARCHDIR)/root/boot/$(BINARY)
 ISOCFG := $(ARCHDIR)/root/boot/limine.cfg
 ISOSRC := $(ARCHDIR)/limine.in.cfg
-ISOIMG := $(ROOTDIR)/demos-$(CONFIG_VERSION).$(ARCH).iso
+ISOIMG := $(ROOTDIR)/delta-$(CONFIG_VERSION).$(ARCH).iso
 
 clean_list_root_y += $(ISOBIN)
 clean_list_root_y += $(ISOCFG)

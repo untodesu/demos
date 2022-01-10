@@ -132,6 +132,6 @@ echo "CPFLAGS += -I $rootdir/include"               >> "$rootdir/config.1.mk"
 echo "CPFLAGS += -I $archdir/include"               >> "$rootdir/config.1.mk"
 
 info "processing linker script"
-$GCC_X -nostdinc -I "$rootdir/include" -I "$archdir/include" -E -xc -D__ASSEMBLER__=1 -D__kernel__=1 -D__demos__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
+$GCC_X -nostdinc -I "$rootdir/include" -I "$archdir/include" -E -xc -D__ASSEMBLER__=1 -D__kernel__=1 -D__delta__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
 
 exit 0

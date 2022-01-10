@@ -2,7 +2,7 @@ include ./config.0.mk
 include ./config.1.mk
 
 INTERNALCCFLAGS := -pipe -std=gnu99 -ffreestanding -O2 -Wall -Wextra -pedantic -Werror
-INTERNALCPFLAGS := -nostdinc -D__kernel__=1 -D__demos__=1
+INTERNALCPFLAGS := -nostdinc -D__kernel__=1 -D__delta__=1
 INTERNALLDFLAGS := -nostdlib -T ./link.ld -static
 
 CC := $(GCC)
@@ -34,7 +34,7 @@ define add_subdir
     TREE := $$(patsubst %/$(1),%,$$(TREE))
 endef
 
-BINARY := demos-$(CONFIG_VERSION).$(ARCH).elf
+BINARY := delta-$(CONFIG_VERSION).$(ARCH).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(ARCHDIR)))
