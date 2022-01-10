@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018, Joe Davis <me@jo.ie>
- * Copyright (C) 2020, 2021, Kirill GPRB
+ * Copyright (C) 2020, 2021, 2022, Kirill GPRB
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
