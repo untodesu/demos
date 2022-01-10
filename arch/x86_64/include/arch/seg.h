@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _ARCH_SEG_H_
 #define _ARCH_SEG_H_ 1
 

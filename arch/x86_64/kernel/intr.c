@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #include <arch/intr.h>
 #include <arch/seg.h>
 #include <sys/klog.h>

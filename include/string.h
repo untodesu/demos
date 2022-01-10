@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _STRING_H_
 #define _STRING_H_ 1
 #include <stddef.h>

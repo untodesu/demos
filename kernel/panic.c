@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #include <arch/cpu.h>
 #include <sys/klog.h>
 #include <sys/panic.h>

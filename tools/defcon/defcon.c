@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
+
 /* Require POSIX.2-1992 */
 #define _POSIX_C_SOURCE 2
 

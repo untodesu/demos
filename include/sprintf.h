@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _SPRINTF_H_
 #define _SPRINTF_H_ 1
 #include <sys/compiler.h>

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _ARCH_I8253_H_
 #define _ARCH_I8253_H_ 1
 #include <stddef.h>

@@ -1,7 +1,4 @@
 .vscode/
-include/delta/config.h
-isoroot/boot/limine.cfg
-isoroot/boot/delta*.elf
 defcon.ini
 config.*.mk
 link.ld

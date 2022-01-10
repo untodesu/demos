@@ -1,9 +1,11 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
+#ifndef _ARCH_VADDR_H_
+#define _ARCH_VADDR_H_ 1
+
 /* NOTENOTE: this would be changed to mm.h
  * with according offsets. Also vaddr->paddr
  * and back conversion should be done with a
  * different offset as I can see in QWord... */
-#ifndef _ARCH_VADDR_H_
-#define _ARCH_VADDR_H_ 1
 
 #define KERNEL_VIRTUAL_BASE 0xFFFFFFFF80000000
 #define KERNEL_LOAD_ADDRESS 0x0000000000200000

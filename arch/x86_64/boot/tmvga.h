@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _TMVGA_H_
 #define _TMVGA_H_ 1
 #include <stddef.h>

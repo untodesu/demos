@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 .section .text
 .global _start
 _start:

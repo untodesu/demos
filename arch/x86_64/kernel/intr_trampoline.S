@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 .section .text
 
 __isr_wrapper:

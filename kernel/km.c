@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #include <arch/pmm.h>
 #include <sys/km.h>
 

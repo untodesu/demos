@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _ARCH_CPU_H_
 #define _ARCH_CPU_H_ 1
 #include <sys/compiler.h>

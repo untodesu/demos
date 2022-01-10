@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
 #include <sys/klog.h>
 #include <sprintf.h>

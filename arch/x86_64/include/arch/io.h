@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _ARCH_IO_H_
 #define _ARCH_IO_H_ 1
 #include <stdint.h>
