@@ -3,17 +3,15 @@
 #include <sprintf.h>
 #include <string.h>
 
-#define KLOG_MESSAGE_SIZE 1024
-
 struct klog_message {
     int level;
-    char message[KLOG_MESSAGE_SIZE];
+    char message[CONFIG_KLOG_ENTRY_SIZE];
 };
 
 static int klog_level = KLOG_DEBUG;
 static unsigned int klog_begin = 0;
 static unsigned int klog_end = 0;
-static struct klog_message klog_buf[KLOG_BUFFER_SIZE] = { 0 };
+static struct klog_message klog_buf[CONFIG_KLOG_RINGBUF_SIZE] = { 0 };
 static klog_print_func_t klog_print_func = NULL;
 
 static const char *klog_get_prefix(int level)
@@ -68,8 +66,8 @@ static void klog_push(const struct klog_message *msg)
     klog_print(klog_buf + klog_end);
 
     klog_end++;
-    klog_begin = klog_end / KLOG_BUFFER_SIZE;
-    klog_end = klog_end % KLOG_BUFFER_SIZE;
+    klog_begin = klog_end / CONFIG_KLOG_RINGBUF_SIZE;
+    klog_end = klog_end % CONFIG_KLOG_RINGBUF_SIZE;
 }
 
 void init_klog(void)
@@ -83,8 +81,8 @@ void set_klog_print_func(klog_print_func_t func)
 {
     unsigned int i;
     if((klog_print_func = func)) {
-        for(i = 0; i < KLOG_BUFFER_SIZE; i++)
-            klog_print(klog_buf + (i + klog_end) % KLOG_BUFFER_SIZE);
+        for(i = 0; i < CONFIG_KLOG_RINGBUF_SIZE; i++)
+            klog_print(klog_buf + (i + klog_end) % CONFIG_KLOG_RINGBUF_SIZE);
     }
 }
 

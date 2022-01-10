@@ -1,0 +1,11 @@
+def begin x86.boot.stack_size
+def     macro BOOT_STACK_SIZE
+def     type unsigned_integer
+def     value 16384
+def end
+
+def begin x86.boot.title
+def     macro BOOT_TITLE
+def     type string
+def     value "Demos/X86"
+def end

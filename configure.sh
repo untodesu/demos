@@ -1,21 +1,35 @@
-#!/bin/sh
+#!/bin/bash
 
-die() {
-    >&2 echo -e "\033[91m(!!!) fatal:\033[0m $@"
+function die {
+    >&2 echo -e "\033[31;91m(!!!) \033[0m$@\033[0m"
     exit 1
 }
 
-log() {
-    >&2 echo -e "$@"
+function error {
+    >&2 echo -e "\033[31;91m(!!!) \033[0m$@\033[0m"
 }
 
-chk_dir() {
+function warn {
+    >&2 echo -e "\033[33;93m(!! ) \033[0m$@\033[0m"
+}
+
+function note {
+    >&2 echo -e "\033[36;96m(!  ) \033[0m$@\033[0m"
+}
+
+function info {
+    >&2 echo -e "(   ) $@\033[0m"
+}
+
+function chk_dir {
+    info "checking $1"
     if [ ! -d "$1" ]; then
         die "$1 no such directory"
     fi
 }
 
-chk_file() {
+function chk_file {
+    info "checking $1"
     if [ ! -f "$1" ]; then
         die "$1: no such directory"
     fi
@@ -24,31 +38,70 @@ chk_file() {
 arch=
 if [ -z "$1" ]; then
     arch="x86_64"
-    log "(!  ) argv[1] not present, defaulting arch=$arch"
+    warn "argv[1] not present, defaulting arch=$arch"
 else
     arch="$1"
-    log "setting arch=$arch"
+    info "setting arch=$arch"
 fi
 
-host=
-if [ -z "$2" ]; then
-    host="linux_amd64"
-    log "(!!!) argv[2] not present, defaulting host=$host"
-else
-    host="$2"
-    log "setting host=$host"
-fi
-
-bindir="./tools/$host"
 archdir="./arch/$arch"
 rootdir="."
 
-chk_dir "$bindir"
+info "building necessary tools: defcon"
+(cd "$rootdir/tools/defcon" && make defcon)
+
 chk_dir "$archdir"
 chk_file "$archdir/gcc_list.txt"
 chk_file "$archdir/link.in.ld"
 
-"$bindir/defcon" -C "$rootdir/include/config.h" -M "$rootdir/config.0.mk" -c "$rootdir/kernel.conf" "$rootdir/defcon.ini" "$archdir/defcon.ini"
+def_file="$rootdir/defcon.ini"
+def_tree=()
+
+truncate -s 0 "$def_file"
+
+function def {
+    case $1 in
+        "walk")
+            if [ -z $def_tree ]; then
+                def_path="$2"
+            else
+                def_path="${def_tree[-1]}/$2"
+            fi
+            def_tree+=("$def_path")
+            info "entering $def_path"
+            if [ ! -f "$def_path/DefConfig" ]; then
+                warn "walking through $def_path failed"
+            else
+                source "$def_path/DefConfig"
+            fi
+            unset def_tree[-1]
+            ;;
+        "begin")
+            echo "[$2]" >> "$def_file"
+            ;;
+        "macro")
+            echo "macro = $2" >> "$def_file"
+            ;;
+        "type")
+            echo "type = $2" >> "$def_file"
+            ;;
+        "value")
+            echo "value = $2" >> "$def_file"
+            ;;
+        "end")
+            echo "" >> "$def_file"
+            ;;
+        *)
+            warn "Unknown command: def $@"
+            ;;
+    esac
+}
+
+info "genearating defcon.ini..."
+def walk "."
+
+info "generating headers..."
+"$rootdir/tools/defcon/defcon" -C "$rootdir/include/config.h" -M "$rootdir/config.0.mk" -c "$rootdir/kernel.conf" "$rootdir/defcon.ini"
 
 GCC_X="gcc"
 while IFS= read -r line; do
@@ -59,6 +112,7 @@ while IFS= read -r line; do
     fi
 done < "$archdir/gcc_list.txt"
 command -v $GCC_X > /dev/null || die "gcc not found"
+info "using $GCC_X"
 
 truncate -s 0 $rootdir/config.1.mk
 echo "ARCH:=$arch"                                  >> "$rootdir/config.1.mk"
@@ -67,6 +121,7 @@ echo "ARCHDIR:=$archdir"                            >> "$rootdir/config.1.mk"
 echo "ROOTDIR:=$rootdir"                            >> "$rootdir/config.1.mk"
 echo "GCC:=$GCC_X"                                  >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST :="                           >> "$rootdir/config.1.mk"
+echo "HARD_CLEAN_LIST += $rootdir/defcon.ini"       >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/include/config.h" >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/config.0.mk"      >> "$rootdir/config.1.mk"
 echo "HARD_CLEAN_LIST += $rootdir/config.1.mk"      >> "$rootdir/config.1.mk"
@@ -75,10 +130,7 @@ echo "CPFLAGS :="                                   >> "$rootdir/config.1.mk"
 echo "CPFLAGS += -I $rootdir/include"               >> "$rootdir/config.1.mk"
 echo "CPFLAGS += -I $archdir/include"               >> "$rootdir/config.1.mk"
 
+info "generating linker script..."
 $GCC_X -nostdinc -I "$rootdir/include" -I "$archdir/include" -E -xc -D__ASSEMBLER__=1 -D__kernel__=1 -D__demos__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
-
-if [ -f "$archdir/configure.sh" ]; then
-    source "$archdir/configure.sh"
-fi
 
 exit 0

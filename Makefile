@@ -23,7 +23,7 @@ define add_subdir
 	clean_list_root_y :=
     subdirs_y :=
 
-    include $$(TREE)/makefile
+    include $$(TREE)/Makefile
 
     SOURCES += $$(patsubst %,$$(TREE)/%,$$(sources_y))
     CLEAN_LIST += $$(patsubst %,$$(TREE)/%,$$(clean_list_tree_y))
@@ -34,7 +34,7 @@ define add_subdir
     TREE := $$(patsubst %/$(1),%,$$(TREE))
 endef
 
-BINARY := demos-$(VERSION).$(ARCH).elf
+BINARY := demos-$(CONFIG_VERSION).$(ARCH).elf
 CLEAN_LIST += $(BINARY)
 
 $(eval $(call add_subdir,$(ARCHDIR)))
@@ -51,6 +51,7 @@ all: kernel
 kernel: $(BINARY)
 
 clean: soft_clean
+	(cd tools; $(MAKE) clean)
 	@$(foreach item,$(HARD_CLEAN_LIST),echo "rm -f $(item)";rm -f $(item);)
 
 # Soft clean means that we clean only object files

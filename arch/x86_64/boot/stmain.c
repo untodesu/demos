@@ -28,7 +28,7 @@ void __used __noreturn stmain(__unused struct stivale2_struct *st2)
 {
     init_klog();
     set_klog_level(KLOG_DEBUG);
-    klog(KLOG_INFO, "kernel version %s", VERSION);
+    klog(KLOG_INFO, "kernel version %s", CONFIG_VERSION);
     klog(KLOG_INFO, "bootloader: %s %s", st2->bootloader_brand, st2->bootloader_version);
 
     setup_gdt();

@@ -1,0 +1,9 @@
+def begin version
+def     macro VERSION
+def     type string
+def     value 0.01
+def end
+
+def walk arch/$arch
+def walk kernel
+def walk lib
