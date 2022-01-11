@@ -21,117 +21,154 @@ function info {
     >&2 echo -e "\033[37;97;1m(   ) \033[0m$@\033[0m"
 }
 
-function chk_dir {
+function check_d {
     info "checking (dir ) $1"
     if [ ! -d "$1" ]; then
         die "$1 no such directory"
     fi
 }
 
-function chk_file {
+function check_f {
     info "checking (file) $1"
     if [ ! -f "$1" ]; then
         die "$1: no such directory"
     fi
 }
 
-arch=
-if [ -z "$1" ]; then
-    arch="x86_64"
-    warn "argv[1] not present, defaulting arch=$arch"
-else
-    arch="$1"
-    info "setting arch=$arch"
-fi
-
-archdir="./arch/$arch"
-rootdir="."
-
-info "building necessary tools"
-(cd "$rootdir/tools/defcon" && make defcon)
-
-chk_dir "$archdir"
-chk_file "$archdir/gcc_list.txt"
-chk_file "$archdir/link.in.ld"
-
-def_file="$rootdir/defcon.ini"
-def_tree=()
-
-truncate -s 0 "$def_file"
-
-function def {
-    case $1 in
-        "walk")
-            if [ -z $def_tree ]; then
-                def_path="$2"
-            else
-                def_path="${def_tree[-1]}/$2"
-            fi
-            def_tree+=("$def_path")
-            info "entering $def_path"
-            if [ ! -f "$def_path/DefConfig" ]; then
-                warn "walking through $def_path failed"
-            else
-                source "$def_path/DefConfig"
-            fi
-            unset def_tree[-1]
-            ;;
-        "begin")
-            echo "[$2]" >> "$def_file"
-            ;;
-        "macro")
-            echo "macro = $2" >> "$def_file"
-            ;;
-        "type")
-            echo "type = $2" >> "$def_file"
-            ;;
-        "value")
-            echo "value = $2" >> "$def_file"
-            ;;
-        "end")
-            echo "" >> "$def_file"
-            ;;
-        *)
-            warn "Unknown command: def $@"
-            ;;
-    esac
+function _usage {
+    error "usage: configure.sh [options]"
+    error "options:"
+    error " -a <arch>   : set the target arhitecture"
+    error " -h          : print this message and exit"
 }
 
-info "generating defcon.ini (DefConfig)"
-def walk "."
+target_arch=
+while getopts "a:h" opt; do
+    case "$opt" in
+        "a")    target_arch="$OPTARG"   ;;
+        "h")    _usage; exit 0          ;;
+        *)      _usage; exit 1          ;;
+    esac
+done
 
-info "generating config.h and config.0.mk"
-"$rootdir/tools/defcon/defcon" -C "$rootdir/include/config.h" -M "$rootdir/config.0.mk" -c "$rootdir/kernel.conf" "$rootdir/defcon.ini"
+if [ -z "$target_arch" ]; then
+    target_arch="x86_64"
+    warn "target_arch not set, defaulting to $target_arch"
+fi
 
-GCC_X="gcc"
-while IFS= read -r line; do
-    if [ -z "$line" ]; then continue; fi
-    if command -v $line > /dev/null; then
-        GCC_X=$line
+target_gcc_exec=
+target_prefix=
+
+target_prefixes=("unknown-elf" "unknown" "demos-elf" "demos")
+for pfx in $target_prefixes; do
+    gcc_exec="$target_arch-$pfx-gcc"
+    if command -v $gcc_exec > /dev/null; then
+        target_gcc_exec="$gcc_exec"
+        target_prefix="$pfx"
         break
     fi
-done < "$archdir/gcc_list.txt"
-command -v $GCC_X > /dev/null || die "gcc not found"
-info "using gcc: $GCC_X"
+done
+command -v $target_gcc_exec > /dev/null || die "gcc not found"
+info "using $target_gcc_exec"
 
-info "generating config.1.mk"
-truncate -s 0 $rootdir/config.1.mk
-echo "ARCH:=$arch"                                  >> "$rootdir/config.1.mk"
-echo "BINDIR:=$bindir"                              >> "$rootdir/config.1.mk"
-echo "ARCHDIR:=$archdir"                            >> "$rootdir/config.1.mk"
-echo "ROOTDIR:=$rootdir"                            >> "$rootdir/config.1.mk"
-echo "GCC:=$GCC_X"                                  >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST :="                           >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/defcon.ini"       >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/include/config.h" >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/config.0.mk"      >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/config.1.mk"      >> "$rootdir/config.1.mk"
-echo "HARD_CLEAN_LIST += $rootdir/link.ld"          >> "$rootdir/config.1.mk"
-echo "CPFLAGS :="                                   >> "$rootdir/config.1.mk"
-echo "CPFLAGS += -I $rootdir/include"               >> "$rootdir/config.1.mk"
-echo "CPFLAGS += -I $archdir/include"               >> "$rootdir/config.1.mk"
+root_path="."
+tool_path="./tools"
+sysr_path="./sysroot"
 
-info "processing linker script"
-$GCC_X -nostdinc -I "$rootdir/include" -I "$archdir/include" -E -xc -D__ASSEMBLER__=1 -D__kernel__=1 -D__delta__=1 "$archdir/link.in.ld" | grep -v "^#" > "$rootdir/link.ld"
+mkdir -p "$sysr_path"
 
+info "building tools"
+make install -C "$tool_path"
+check_f "$tool_path/genconfig"
+
+config_ecur="null"
+config_outf="$root_path/.config.deffile"
+config_tree=()
+
+truncate -s 0 "$config_outf"
+
+function recurse {
+    if [ -z "$config_tree" ]; then
+        config_path="$1"
+    else
+        config_path="${config_tree[-1]}/$1"
+    fi
+    info "entering $config_path"
+    config_tree+=("$config_path")
+    _config_sh="$config_path/.config.sh"
+    if [ -f "$_config_sh" ]; then
+        source "$_config_sh"
+    else
+        warn "walking through $config_path failed"
+    fi
+    unset config_tree[-1]
+}
+
+function entry {
+    config_ecur="$1"
+    echo "\$entry\$$1\$$2\$" >> "$config_outf"
+    if [ "$3" == "noedit" ]; then
+        echo "\$noedit\$$1\$" >> "$config_outf"
+    fi
+}
+
+function endentry {
+    config_ecur=""
+}
+
+function describe {
+    if [ ! -z "$config_ecur" ]; then
+        echo "\$describe\$$config_ecur\$$@\$" >> "$config_outf"
+    else
+        warn "calling \"$0\" without active entry"
+    fi
+}
+
+function set_macro {
+    if [ ! -z "$config_ecur" ]; then
+        echo "\$set_macro\$$config_ecur\$$1\$" >> "$config_outf"
+    else
+        warn "calling \"$0\" without active entry"
+    fi
+}
+
+function set_value {
+    if [ ! -z "$config_ecur" ]; then
+        echo "\$set_value\$$config_ecur\$$@\$" >> "$config_outf"
+    else
+        warn "calling \"$0\" without active entry"
+    fi
+}
+
+info "generating $config_outf"
+recurse "."
+
+config_chead="$root_path/include/config.h"
+config_make0="$root_path/.config.0.mk"
+config_make1="$root_path/.config.1.mk"
+
+info "generating $config_chead"
+info "generating $config_make0"
+"$tool_path/genconfig" -C "$config_chead" -M "$config_make0" "$root_path/demos.conf" "$config_outf"
+
+info "generating $config_make1"
+truncate -s 0 "$config_make1"
+echo "TARGET_ARCH := $target_arch"          >> "$config_make1"
+echo "TARGET_GCC_EXEC := $target_gcc_exec"  >> "$config_make1"
+echo "TARGET_PREFIX := $target_prefix"      >> "$config_make1"
+echo "ROOT_PATH := $root_path"              >> "$config_make1"
+echo "TOOL_PATH := $tool_path"              >> "$config_make1"
+echo "SYSR_PATH := $sysr_path"              >> "$config_make1"
+echo "HARD_CLNS :="                         >> "$config_make1"
+echo "HARD_CLNS += $config_outf"            >> "$config_make1"
+echo "HARD_CLNS += $config_chead"           >> "$config_make1"
+echo "HARD_CLNS += $config_make0"           >> "$config_make1"
+echo "HARD_CLNS += $config_make1"           >> "$config_make1"
+echo "CPPFLAGS += -D__demos__=1"            >> "$config_make1"
+
+check_f "$config_chead"
+check_f "$config_make0"
+check_f "$config_make1"
+
+error "done"
 exit 0

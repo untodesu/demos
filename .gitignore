@@ -1,9 +1,11 @@
 .vscode/
-defcon.ini
-config.*.mk
+include/config.h
+./sysroot/
+.config.deffile
+.config.*.mk
 link.ld
-delta*.elf
-delta*.iso
+demos*.elf
+demos*.iso
 *.c.o
 *.S.o
 *.s.o
