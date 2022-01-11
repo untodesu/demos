@@ -1,6 +1,6 @@
-.vscode/
-include/config.h
-./sysroot/
+/.vscode/
+/include/config.h
+/sysroot/
 .config.deffile
 .config.*.mk
 link.ld
