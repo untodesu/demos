@@ -4,7 +4,7 @@ include/config.h
 .config.deffile
 .config.*.mk
 link.ld
-demos*.elf
+vmdemos
 demos*.iso
 *.c.o
 *.S.o
