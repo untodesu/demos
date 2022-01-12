@@ -15,7 +15,6 @@ enum {
 
 typedef void(*klog_sink_t)(const void *, size_t);
 
-void init_klog(void);
 void set_klog_sink(klog_sink_t sink);
 void set_klog_level(int level);
 void klogv(int level, const char *fmt, va_list va);

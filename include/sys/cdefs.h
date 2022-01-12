@@ -6,6 +6,8 @@
 #define __stringify1(x) #x
 #define __stringify(x) __stringify1(x)
 #define __mark_used(x) ((void)(x))
+#define __concat1(x, y) x##y
+#define __concat(x, y) __concat1(x, y)
 
 /* GNU C attributes */
 #define __alias(x) __attribute__((alias(#x)))

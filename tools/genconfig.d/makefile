@@ -1,14 +1,14 @@
 ROOT_PATH := ../..
 
-include $(ROOT_PATH)/tools/scripts/make/common.mk
-include $(ROOT_PATH)/tools/scripts/make/tools.host.mk
+include $(ROOT_PATH)/tools/make/common.mk
+include $(ROOT_PATH)/tools/make/tools.host.mk
 
 all: genconfig
 
 clean:
 	$(RM) genconfig
 
-install:
+install: genconfig
 	cp genconfig $(ROOT_PATH)/tools/genconfig
 
 genconfig: genconfig.c

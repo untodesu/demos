@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/io.h>
-#include <sys/intr.h>
+#include <sys/interrupt.h>
 #include <sys/klog.h>
 #include <x86/i8253.h>
 #include <x86/i8259.h>

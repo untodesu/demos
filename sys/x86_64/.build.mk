@@ -3,8 +3,6 @@ ASFLAGS		+= $(X86_XFLAGS)
 CFLAGS		+= $(X86_XFLAGS)
 LDFLAGS		+= -fno-pie -Wl,-static,--no-dynamic-linker,-ztext -z max-page-size=0x1000
 
-PHONY_TARGETS += iso qemu
-
 ISOBIN := demos-$(CONFIG_VERSION).$(TARGET_ARCH).iso
 
 clns_root_y += link.ld
@@ -15,10 +13,10 @@ clns_root_y += $(ISOBIN)
 srcs_y += boot.c
 srcs_y += i8253.c
 srcs_y += i8259.c
-srcs_y += intr.c
-srcs_y += intr.S
+srcs_y += interrupt.c
+srcs_y += interrupt.S
 srcs_y += pmm.c
-srcs_y += seg.c
+srcs_y += segment.c
 
 link.ld: $(TREE)/link.in.ld
 	$(CC) $(CFLAGS) $(CPPFLAGS) -D__ASSEMBLER__=1 -E -xc $(realpath $<) | grep -v "^#" > $@ || true
@@ -39,7 +37,9 @@ $(ISOBIN): $(SYSR_PATH)/limine.cfg $(SYSR_PATH)/$(KBIN)
 			$(SYSR_PATH) -o $(ISOBIN)
 	$(TOOL_PATH)/limine-install $(ISOBIN)
 
+PHONY_TARGETS += iso
 iso: $(ISOBIN)
 
+PHONY_TARGETS += qemu
 qemu: $(ISOBIN)
 	qemu-system-x86_64 -cdrom $(ISOBIN)

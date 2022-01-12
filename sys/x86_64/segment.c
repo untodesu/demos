@@ -1,8 +1,9 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <stdint.h>
+#include <sys/init.h>
 #include <sys/klog.h>
 #include <sys/kstring.h>
-#include <x86/seg.h>
+#include <x86/segment.h>
 
 #define SEG_READWRITE   (1 << 1)
 #define SEG_CONFORMING  (1 << 2)
@@ -40,7 +41,7 @@ void set_entry(uint8_t id, uint8_t flags)
     memcpy(gdt + id, &entry, sizeof(entry));
 }
 
-void setup_gdt(void)
+static int init_seg(void)
 {
     uint8_t code_flags = SEG_READWRITE | SEG_NONSYSTEM | SEG_EXECUTABLE;
     uint8_t data_flags = SEG_READWRITE | SEG_NONSYSTEM;
@@ -72,4 +73,10 @@ void setup_gdt(void)
         :
         : "i"(SEG_SELECTOR(SEG_INDEX_KERN_CODE, 0, 0)), "i"(SEG_SELECTOR(SEG_INDEX_KERN_DATA, 0, 0))
     );
+
+    return 0;
 }
+
+extern_initcall(klog);
+early_initcall(segment, init_seg);
+initcall_dependency(segment, klog);

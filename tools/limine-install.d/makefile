@@ -1,7 +1,7 @@
 ROOT_PATH := ../..
 
-include $(ROOT_PATH)/tools/scripts/make/common.mk
-include $(ROOT_PATH)/tools/scripts/make/tools.host.mk
+include $(ROOT_PATH)/tools/make/common.mk
+include $(ROOT_PATH)/tools/make/tools.host.mk
 
 CFLAGS := -O2 -pipe -Wall -Wextra
 

@@ -3,12 +3,12 @@
 #include <stivale2.h>
 #include <sys/cdefs.h>
 #include <sys/cpu.h>
-#include <sys/intr.h>
+#include <sys/init.h>
+#include <sys/interrupt.h>
 #include <sys/klog.h>
 #include <x86/i8253.h>
 #include <x86/i8259.h>
 #include <x86/pmm.h>
-#include <x86/seg.h>
 #include <x86/vm.h>
 
 static const void *find_st2_tag(const struct stivale2_struct *st2, uint64_t identifier)
@@ -25,13 +25,15 @@ static const void *find_st2_tag(const struct stivale2_struct *st2, uint64_t iden
 
 static void __used __noreturn kmain(__unused struct stivale2_struct *st2)
 {
-    init_klog();
+    size_t i;
+    for(i = 0; initcalls[i]; i++) {
+        /* for now ignore the return code */
+        initcalls[i]();
+    }
+
     set_klog_level(KLOG_DBG);
     klog(KLOG_INF, "kernel version %s", CONFIG_VERSION);
     klog(KLOG_INF, "bootloader: %s %s", st2->bootloader_brand, st2->bootloader_version);
-
-    setup_gdt();
-    init_interrupts();
 
     init_pmm(find_st2_tag(st2, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 

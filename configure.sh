@@ -1,39 +1,10 @@
 #!/bin/bash
 
-function die {
-    >&2 echo -e "\033[31;91;1m(!!!) \033[0m$@\033[0m"
-    exit 1
-}
+root_path="."
+tool_path="./tools"
+sysr_path="./sysroot"
 
-function error {
-    >&2 echo -e "\033[31;91;1m(!!!) \033[0m$@\033[0m"
-}
-
-function warn {
-    >&2 echo -e "\033[33;93;1m(!! ) \033[0m$@\033[0m"
-}
-
-function note {
-    >&2 echo -e "\033[36;96;1m(!  ) \033[0m$@\033[0m"
-}
-
-function info {
-    >&2 echo -e "\033[37;97;1m(   ) \033[0m$@\033[0m"
-}
-
-function check_d {
-    info "checking (dir ) $1"
-    if [ ! -d "$1" ]; then
-        die "$1 no such directory"
-    fi
-}
-
-function check_f {
-    info "checking (file) $1"
-    if [ ! -f "$1" ]; then
-        die "$1: no such directory"
-    fi
-}
+source "$tool_path/shell/common.sh" || exit 1
 
 function _usage {
     error "usage: configure.sh [options]"
@@ -57,6 +28,7 @@ if [ -z "$target_arch" ]; then
 fi
 
 target_gcc_exec=
+target_objdump_exec=
 target_prefix=
 
 target_prefixes=("unknown-elf" "unknown" "demos-elf" "demos")
@@ -64,25 +36,25 @@ for pfx in $target_prefixes; do
     gcc_exec="$target_arch-$pfx-gcc"
     if command -v $gcc_exec > /dev/null; then
         target_gcc_exec="$gcc_exec"
+        target_objdump_exec="$target_arch-$pfx-objdump"
         target_prefix="$pfx"
         break
     fi
 done
-command -v $target_gcc_exec > /dev/null || die "gcc not found"
+command -v $target_gcc_exec     > /dev/null || die "gcc not found"
+command -v $target_objdump_exec > /dev/null || die "objdump not found"
 info "using $target_gcc_exec"
-
-root_path="."
-tool_path="./tools"
-sysr_path="./sysroot"
+info "using $target_objdump_exec"
 
 mkdir -p "$sysr_path"
 
 info "building tools"
-make install -C "$tool_path"
+make install clean -C "$tool_path"
+check_f "$tool_path/geninitcalls.sh"
 check_f "$tool_path/genconfig"
 
 config_ecur="null"
-config_outf="$root_path/.config.deffile"
+config_outf="$root_path/config.deffile"
 config_tree=()
 
 truncate -s 0 "$config_outf"
@@ -144,8 +116,8 @@ info "generating $config_outf"
 recurse "."
 
 config_chead="$root_path/include/config.h"
-config_make0="$root_path/.config.0.mk"
-config_make1="$root_path/.config.1.mk"
+config_make0="$root_path/config.0.mk"
+config_make1="$root_path/config.1.mk"
 
 info "generating $config_chead"
 info "generating $config_make0"
@@ -153,18 +125,19 @@ info "generating $config_make0"
 
 info "generating $config_make1"
 truncate -s 0 "$config_make1"
-echo "TARGET_ARCH := $target_arch"          >> "$config_make1"
-echo "TARGET_GCC_EXEC := $target_gcc_exec"  >> "$config_make1"
-echo "TARGET_PREFIX := $target_prefix"      >> "$config_make1"
-echo "ROOT_PATH := $root_path"              >> "$config_make1"
-echo "TOOL_PATH := $tool_path"              >> "$config_make1"
-echo "SYSR_PATH := $sysr_path"              >> "$config_make1"
-echo "HARD_CLNS :="                         >> "$config_make1"
-echo "HARD_CLNS += $config_outf"            >> "$config_make1"
-echo "HARD_CLNS += $config_chead"           >> "$config_make1"
-echo "HARD_CLNS += $config_make0"           >> "$config_make1"
-echo "HARD_CLNS += $config_make1"           >> "$config_make1"
-echo "CPPFLAGS += -D__demos__=1"            >> "$config_make1"
+echo "TARGET_ARCH := $target_arch"                  >> "$config_make1"
+echo "TARGET_GCC_EXEC := $target_gcc_exec"          >> "$config_make1"
+echo "TARGET_OBJDUMP_EXEC := $target_objdump_exec"  >> "$config_make1"
+echo "TARGET_PREFIX := $target_prefix"              >> "$config_make1"
+echo "ROOT_PATH := $root_path"                      >> "$config_make1"
+echo "TOOL_PATH := $tool_path"                      >> "$config_make1"
+echo "SYSR_PATH := $sysr_path"                      >> "$config_make1"
+echo "HARD_CLNS :="                                 >> "$config_make1"
+echo "HARD_CLNS += $config_outf"                    >> "$config_make1"
+echo "HARD_CLNS += $config_chead"                   >> "$config_make1"
+echo "HARD_CLNS += $config_make0"                   >> "$config_make1"
+echo "HARD_CLNS += $config_make1"                   >> "$config_make1"
+echo "CPPFLAGS += -D__demos__=1"                    >> "$config_make1"
 
 check_f "$config_chead"
 check_f "$config_make0"

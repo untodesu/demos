@@ -1,10 +1,10 @@
 /.vscode/
 /include/config.h
 /sysroot/
-.config.deffile
-.config.*.mk
+config.deffile
+config.*.mk
 link.ld
-vmdemos
+vmdemos*
 demos*.iso
 *.c.o
 *.S.o

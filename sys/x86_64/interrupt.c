@@ -1,8 +1,9 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#include <sys/intr.h>
+#include <sys/init.h>
+#include <sys/interrupt.h>
 #include <sys/klog.h>
 #include <sys/kstring.h>
-#include <x86/seg.h>
+#include <x86/segment.h>
 
 #define IDT_TRAP    (15 << 0)
 #define IDT_INTR    (14 << 0)
@@ -311,7 +312,7 @@ void set_interrupt_handler(unsigned int vector, interrupt_handler_t handler)
     handlers[vector] = handler;
 }
 
-void init_interrupts(void)
+static int init_interrupt(void)
 {
     memset(idt, 0, sizeof(idt));
 
@@ -578,4 +579,10 @@ void init_interrupts(void)
     klog(KLOG_INF, "idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
 
     asm volatile("lidtq %0"::"m"(idt_ptr));
+
+    return 0;
 }
+
+extern_initcall(segment);
+early_initcall(interrupt, init_interrupt);
+initcall_dependency(interrupt, segment);

@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
+#include <sys/init.h>
 #include <sys/klog.h>
 #include <sys/ksprintf.h>
 #include <sys/kstring.h>
@@ -73,13 +74,6 @@ static void klog_push(const struct klog_message *msg)
     klog_end = klog_end % CONFIG_KLOG_ENTRY_COUNT;
 }
 
-void init_klog(void)
-{
-    memset(klog_buf, 0, sizeof(klog_buf));
-    klog_begin = 0;
-    klog_end = 0;
-}
-
 void set_klog_sink(klog_sink_t sink)
 {
     unsigned int i;
@@ -108,3 +102,13 @@ void klog(int level, const char *fmt, ...)
     klogv(level, fmt, va);
     va_end(va);
 }
+
+int init_klog(void)
+{
+    memset(klog_buf, 0, sizeof(klog_buf));
+    klog_begin = 0;
+    klog_end = 0;
+    return 0;
+}
+
+early_initcall(klog, init_klog);
