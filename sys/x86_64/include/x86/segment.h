@@ -10,4 +10,9 @@
 
 #define SEG_SELECTOR(index, ldt, ring) (((ring) & 4) | (((ldt) & 1) << 2) | (index) << 3)
 
+#ifndef __ASSEMBLER__
+#include <sys/init.h>
+initcall_extr(segment);
+#endif
+
 #endif

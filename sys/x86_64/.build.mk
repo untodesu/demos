@@ -10,18 +10,21 @@ clns_root_y += $(SYSR_PATH)/limine.cfg
 clns_root_y += $(SYSR_PATH)/$(KBIN)
 clns_root_y += $(ISOBIN)
 
-srcs_y += boot.c
 srcs_y += i8253.c
 srcs_y += i8259.c
 srcs_y += interrupt.c
 srcs_y += interrupt.S
+srcs_y += kmain.c
 srcs_y += pmm.c
 srcs_y += segment.c
+srcs_y += st2.c
 
-link.ld: $(TREE)/link.in.ld
+tree_y += boot
+
+link.ld: $(TREE)/.link.in.ld
 	$(CC) $(CFLAGS) $(CPPFLAGS) -D__ASSEMBLER__=1 -E -xc $(realpath $<) | grep -v "^#" > $@ || true
 
-$(SYSR_PATH)/limine.cfg: $(TREE)/sysroot/limine.in.cfg
+$(SYSR_PATH)/boot/limine.cfg: $(TREE)/.limine.in.cfg
 	BOOT_BINARY=$(KBIN)						\
 	BOOT_ENTRY=$(CONFIG_BOOTLOADER_TITLE)	\
 	envsubst < $(realpath $<) > $@
@@ -29,10 +32,10 @@ $(SYSR_PATH)/limine.cfg: $(TREE)/sysroot/limine.in.cfg
 $(SYSR_PATH)/$(KBIN): $(KBIN)
 	cp $< $@
 
-$(ISOBIN): $(SYSR_PATH)/limine.cfg $(SYSR_PATH)/$(KBIN)
-	xorriso	-as mkisofs -b limine-cd.bin								\
+$(ISOBIN): $(SYSR_PATH)/boot/limine.cfg $(SYSR_PATH)/$(KBIN)
+	xorriso	-as mkisofs -b boot/limine-cd.bin							\
 			-no-emul-boot -boot-load-size 4 -boot-info-table			\
-			--efi-boot limine-eltorito-efi.bin							\
+			--efi-boot boot/limine-eltorito-efi.bin						\
 			-efi-boot-part --efi-boot-image --protective-msdos-label	\
 			$(SYSR_PATH) -o $(ISOBIN)
 	$(TOOL_PATH)/limine-install $(ISOBIN)

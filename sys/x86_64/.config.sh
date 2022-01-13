@@ -10,10 +10,10 @@ entry x86.boot.loader_title string
     set_value "Demos/$target_arch"
 endentry
 
-check_f "$config_path/sysroot/limine.in.cfg"
-check_f "$config_path/sysroot/limine-cd.bin"
-check_f "$config_path/sysroot/limine-eltorito-efi.bin"
-check_f "$config_path/sysroot/limine.sys" # limine.sus
+check_f "$config_path/.limine.in.cfg"
+check_f "$config_path/sysroot/boot/limine-cd.bin"
+check_f "$config_path/sysroot/boot/limine-eltorito-efi.bin"
+check_f "$config_path/sysroot/boot/limine.sys" # limine.sus
 command -v "$tool_path/limine-install" > /dev/null || die "limine-install not found"
 command -v xorriso > /dev/null || die "xorriso not found"
 

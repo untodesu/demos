@@ -12,7 +12,7 @@ struct klog_message {
     char message[CONFIG_KLOG_ENTRY_SIZE];
 };
 
-static int klog_level = KLOG_DBG;
+static int klog_level = KLOG_DEBUG;
 static unsigned int klog_begin = 0;
 static unsigned int klog_end = 0;
 static struct klog_message klog_buf[CONFIG_KLOG_ENTRY_COUNT] = { 0 };
@@ -24,23 +24,23 @@ static const char *klog_get_prefix(int level)
     unsigned int color;
     const char *prefix;
     switch(level) {
-        case KLOG_INF:
+        case KLOG_INFO:
             color = 36;
             prefix = "INF";
             break;
-        case KLOG_WRN:
+        case KLOG_WARN:
             color = 33;
             prefix = "WRN";
             break;
-        case KLOG_ERR:
+        case KLOG_ERROR:
             color = 31;
             prefix = "ERR";
             break;
-        case KLOG_FTL:
+        case KLOG_FATAL:
             color = 31;
             prefix = "FTL";
             break;
-        case KLOG_DBG:
+        case KLOG_DEBUG:
             color = 37;
             prefix = "DBG";
             break;
@@ -111,4 +111,4 @@ int init_klog(void)
     return 0;
 }
 
-early_initcall(klog, init_klog);
+initcall_early(klog, init_klog);

@@ -1,16 +1,11 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/init.h>
 
-static int init_early(void)
+static int early_init(void)
 {
+    /* this is a stub initcall
+     * required to just be here */
     return 0;
 }
 
-static int init_kernel(void)
-{
-    return 0;
-}
-
-declare_initcall(early, init_early);
-declare_initcall(kernel, init_kernel);
-initcall_dependency(kernel, early);
+initcall_link(early, early_init);

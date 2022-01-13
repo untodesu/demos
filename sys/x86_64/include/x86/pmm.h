@@ -11,9 +11,6 @@
 #include <stddef.h>
 #include <sys/cdefs.h>
 
-struct stivale2_struct_tag_memmap;
-
-void init_pmm(const struct stivale2_struct_tag_memmap *mmap);
 void *pmalloc(size_t num_pages);
 void *pmallocz(size_t num_pages);
 void pmfree(void *ptr, size_t num_pages);

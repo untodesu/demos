@@ -116,8 +116,8 @@ info "generating $config_outf"
 recurse "."
 
 config_chead="$root_path/include/config.h"
-config_make0="$root_path/config.0.mk"
-config_make1="$root_path/config.1.mk"
+config_make0="$root_path/.config.0.mk"
+config_make1="$root_path/.config.1.mk"
 
 info "generating $config_chead"
 info "generating $config_make0"
@@ -143,5 +143,5 @@ check_f "$config_chead"
 check_f "$config_make0"
 check_f "$config_make1"
 
-error "done"
+info "done"
 exit 0

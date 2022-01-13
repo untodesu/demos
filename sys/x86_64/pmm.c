@@ -3,7 +3,9 @@
 #include <sys/klog.h>
 #include <sys/kstring.h>
 #include <sys/panic.h>
+#include <x86/i8253.h>
 #include <x86/pmm.h>
+#include <x86/st2.h>
 #include <x86/vm.h>
 #include <stivale2.h>
 
@@ -52,19 +54,22 @@ static inline int is_lma(uintptr_t addr)
     return addr <= 0x100000;
 }
 
-void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
+static int init_pmm(void)
 {
     size_t bsz, free_kib, total_kib;
     uint64_t i;
     uintptr_t new_limit;
     pm_page_t bitmap_page;
+    const struct stivale2_struct_tag_memmap *mmap;
     const struct stivale2_mmap_entry *entry;
     const char *entry_type_s;
 
+    mmap = st2_find_tag(STIVALE2_STRUCT_TAG_MEMMAP_ID);
     if(!mmap) {
         /* FIXME: is this necessary considering most of
          * stivale-compliant bootloaders pass the mmap tag? */
         panic("pmm: no memmap was provided by the bootloader!");
+        return 1;
     }
 
     phys_limit = 0;
@@ -116,7 +121,7 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
             phys_limit = new_limit;
         }
 
-        klog(KLOG_INF, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
+        klog(KLOG_INFO, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
     }
 
     bitmap = NULL;
@@ -151,9 +156,14 @@ void init_pmm(const struct stivale2_struct_tag_memmap *mmap)
 
     free_kib = (total_pages - used_pages) * PAGE_SIZE / 1024;
     total_kib /= 1024;
-    klog(KLOG_DBG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz / sizeof(uint32_t));
-    klog(KLOG_DBG, "pmm: %zu/%zu KiB (%zu/%zu MiB) free/usable", free_kib, total_kib, free_kib / 1024, total_kib / 1024);
+    klog(KLOG_DEBUG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz / sizeof(uint32_t));
+    klog(KLOG_DEBUG, "pmm: %zu/%zu KiB (%zu/%zu MiB) free/usable", free_kib, total_kib, free_kib / 1024, total_kib / 1024);
+
+    return 0;
 }
+
+initcall_early(pmm, init_pmm);
+initcall_depn(pmm, i8253);
 
 void *pmalloc(size_t num_pages)
 {

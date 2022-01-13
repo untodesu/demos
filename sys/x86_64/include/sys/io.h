@@ -35,7 +35,7 @@ static inline void io_throttle(void)
 /* build legacy x86 io read functions */
 #define _io_build_legacy_read(bits) \
     static inline io_uint##bits##_t io_read##bits(io_addr_t addr) \
-    {io_uint##bits##_t val;asm volatile(IO_LEGACY_IN##bits" %1,%0":"=a"(val):"Nd"(addr));return val;}\
+    {io_uint##bits##_t val;asm volatile(IO_LEGACY_IN##bits" %1,%0":"=a"(val):"Nd"(addr));return val;} \
     static inline io_uint##bits##_t io_read##bits##_throttle(io_addr_t addr) \
     {io_uint##bits##_t val=io_read##bits(addr);io_throttle();return val;}
 

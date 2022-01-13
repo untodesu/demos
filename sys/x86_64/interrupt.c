@@ -576,13 +576,12 @@ static int init_interrupt(void)
     idt_ptr.limit = (uint16_t)(sizeof(idt) - 1);
     idt_ptr.base = (uintptr_t)(&idt[0]);
 
-    klog(KLOG_INF, "idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
+    klog(KLOG_INFO, "idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
 
     asm volatile("lidtq %0"::"m"(idt_ptr));
 
     return 0;
 }
 
-extern_initcall(segment);
-early_initcall(interrupt, init_interrupt);
-initcall_dependency(interrupt, segment);
+initcall_early(interrupt, init_interrupt);
+initcall_depn(interrupt, segment);

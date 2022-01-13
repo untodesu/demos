@@ -13,7 +13,7 @@ void __noreturn panic(const char *fmt, ...)
     vsnprintf(buffer, sizeof(buffer), fmt, va);
     va_end(va);
 
-    klog(KLOG_FTL, "kernel panic: %s", buffer);
+    klog(KLOG_FATAL, "kernel panic: %s", buffer);
 
     cpu_brick();
 }

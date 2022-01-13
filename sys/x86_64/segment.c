@@ -41,7 +41,7 @@ void set_entry(uint8_t id, uint8_t flags)
     memcpy(gdt + id, &entry, sizeof(entry));
 }
 
-static int init_seg(void)
+static int init_segment(void)
 {
     uint8_t code_flags = SEG_READWRITE | SEG_NONSYSTEM | SEG_EXECUTABLE;
     uint8_t data_flags = SEG_READWRITE | SEG_NONSYSTEM;
@@ -56,7 +56,7 @@ static int init_seg(void)
     gdt_ptr.limit = (uint16_t)(sizeof(gdt) - 1);
     gdt_ptr.base = (uintptr_t)(&gdt[0]);
 
-    klog(KLOG_INF, "gdt: limit=%hu, base=%p", gdt_ptr.limit, (void *)gdt_ptr.base);
+    klog(KLOG_INFO, "gdt: limit=%hu, base=%p", gdt_ptr.limit, (void *)gdt_ptr.base);
 
     asm volatile("lgdtq %0"::"m"(gdt_ptr));
     asm volatile(
@@ -77,6 +77,5 @@ static int init_seg(void)
     return 0;
 }
 
-extern_initcall(klog);
-early_initcall(segment, init_seg);
-initcall_dependency(segment, klog);
+initcall_early(segment, init_segment);
+initcall_depn(segment, klog);

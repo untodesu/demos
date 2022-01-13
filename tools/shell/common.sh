@@ -10,15 +10,15 @@ function error {
 }
 
 function warn {
-    >&2 echo -e "\033[33;93;1m(!! ) \033[0m$@\033[0m"
+    >&2 echo -e "\033[33;93;1m(!!-) \033[0m$@\033[0m"
 }
 
 function note {
-    >&2 echo -e "\033[36;96;1m(!  ) \033[0m$@\033[0m"
+    >&2 echo -e "\033[36;96;1m(!--) \033[0m$@\033[0m"
 }
 
 function info {
-    >&2 echo -e "\033[37;97;1m(   ) \033[0m$@\033[0m"
+    >&2 echo -e "\033[32;92;1m(---) \033[0m$@\033[0m"
 }
 
 function check_d {
