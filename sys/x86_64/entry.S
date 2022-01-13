@@ -2,7 +2,7 @@
 .section .text
 .global _start
 _start:
-    call kmain
+    call xmain
 1:  cli
     hlt
     jmp 1b

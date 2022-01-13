@@ -4,7 +4,7 @@ entry x86.boot.stack_size unsigned_integer
     set_value 16384
 endentry
 
-entry x86.boot.loader_title string
+entry x86.bootloader_title string
     describe "Bootloader entry title"
     set_macro "BOOTLOADER_TITLE"
     set_value "Demos/$target_arch"

@@ -1,5 +1,5 @@
-include ./.config.0.mk
-include ./.config.1.mk
+include ./config.0.mk
+include ./config.1.mk
 
 include $(ROOT_PATH)/tools/make/common.mk
 include $(ROOT_PATH)/tools/make/tools.arch.mk

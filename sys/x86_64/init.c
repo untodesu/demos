@@ -3,8 +3,8 @@
 #include <stivale2.h>
 #include <sys/cdefs.h>
 #include <sys/cpu.h>
-#include <sys/init.h>
-#include <sys/interrupt.h>
+#include <sys/initcall.h>
+#include <sys/interrupts.h>
 #include <sys/klog.h>
 #include <sys/ksprintf.h>
 #include <sys/kstring.h>
@@ -33,7 +33,7 @@ static int init_version(void)
 initcall_early(version, init_version);
 initcall_depn(version, klog);
 
-void __used __noreturn kmain(const struct stivale2_struct *st)
+void __used __noreturn xmain(const struct stivale2_struct *st)
 {
     memcpy(&st2, st, sizeof(struct stivale2_struct));
 

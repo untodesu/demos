@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#ifndef _X86_SEGMENT_H_
-#define _X86_SEGMENT_H_ 1
+#ifndef _SYS_SEGMENT_H_
+#define _SYS_SEGMENT_H_ 1
 
 #define SEG_INDEX_NULL_NULL 0
 #define SEG_INDEX_KERN_CODE 1
@@ -11,7 +11,7 @@
 #define SEG_SELECTOR(index, ldt, ring) (((ring) & 4) | (((ldt) & 1) << 2) | (index) << 3)
 
 #ifndef __ASSEMBLER__
-#include <sys/init.h>
+#include <sys/initcall.h>
 initcall_extr(segment);
 #endif
 

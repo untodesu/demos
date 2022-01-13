@@ -1,9 +1,8 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#include <sys/init.h>
-#include <sys/interrupt.h>
+#include <sys/interrupts.h>
 #include <sys/klog.h>
 #include <sys/kstring.h>
-#include <x86/segment.h>
+#include <sys/segment.h>
 
 #define IDT_TRAP    (15 << 0)
 #define IDT_INTR    (14 << 0)
@@ -306,13 +305,14 @@ void __used __isr_handler(struct interrupt_frame *frame)
     handlers[frame->vector](frame);
 }
 
-void set_interrupt_handler(unsigned int vector, interrupt_handler_t handler)
+int set_interrupt_handler(unsigned int vector, interrupt_handler_t handler)
 {
     vector &= 0xFF;
     handlers[vector] = handler;
+    return 1; /* for now */
 }
 
-static int init_interrupt(void)
+static int init_interrupts(void)
 {
     memset(idt, 0, sizeof(idt));
 
@@ -583,5 +583,5 @@ static int init_interrupt(void)
     return 0;
 }
 
-initcall_early(interrupt, init_interrupt);
-initcall_depn(interrupt, segment);
+initcall_early(interrupts, init_interrupts);
+initcall_depn(interrupts, segment);

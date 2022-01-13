@@ -2,7 +2,7 @@
 #ifndef _SYS_KLOG_H_
 #define _SYS_KLOG_H_ 1
 #include <sys/cdefs.h>
-#include <sys/init.h>
+#include <sys/initcall.h>
 #include <stdarg.h>
 #include <stddef.h>
 

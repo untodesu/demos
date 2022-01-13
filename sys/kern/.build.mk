@@ -1,4 +1,4 @@
-srcs_y += init.c
+srcs_y += initcall.c
 srcs_y += kctype.c
 srcs_y += klog.c
 srcs_y += ksprintf.c

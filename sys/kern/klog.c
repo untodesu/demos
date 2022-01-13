@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
-#include <sys/init.h>
 #include <sys/klog.h>
 #include <sys/ksprintf.h>
 #include <sys/kstring.h>
