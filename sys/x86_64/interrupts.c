@@ -305,6 +305,16 @@ void __used __isr_handler(struct interrupt_frame *frame)
     handlers[frame->vector](frame);
 }
 
+void disable_interrupts(void)
+{
+    cpu_disable_interrupts();
+}
+
+void enable_interrupts(void)
+{
+    cpu_enable_interrupts();
+}
+
 int set_interrupt_handler(unsigned int vector, interrupt_handler_t handler)
 {
     vector &= 0xFF;

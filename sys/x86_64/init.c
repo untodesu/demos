@@ -2,17 +2,11 @@
 #include <config.h>
 #include <stivale2.h>
 #include <sys/cdefs.h>
-#include <sys/cpu.h>
 #include <sys/initcall.h>
 #include <sys/interrupts.h>
 #include <sys/klog.h>
-#include <sys/ksprintf.h>
 #include <sys/kstring.h>
-#include <x86/i8253.h>
-#include <x86/i8259.h>
-#include <x86/pmm.h>
 #include <x86/st2.h>
-#include <x86/vm.h>
 
 static void do_initcalls(void)
 {
@@ -41,6 +35,6 @@ void __used __noreturn xmain(const struct stivale2_struct *st)
 
     do_initcalls();
 
-    cpu_enable_interrupts();
+    enable_interrupts();
     for(;;) asm volatile("hlt");
 }

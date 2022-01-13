@@ -5,6 +5,9 @@
 #include <sys/initcall.h>
 
 typedef void (*interrupt_handler_t)(struct interrupt_frame *);
+
+void disable_interrupts(void);
+void enable_interrupts(void);
 int set_interrupt_handler(unsigned int vector, interrupt_handler_t handler);
 
 initcall_extr(interrupts);

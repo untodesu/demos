@@ -6,7 +6,6 @@
 #include <x86/i8253.h>
 #include <x86/pmm.h>
 #include <x86/st2.h>
-#include <x86/vm.h>
 #include <stivale2.h>
 
 typedef uint64_t pm_page_t;

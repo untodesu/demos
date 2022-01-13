@@ -1,4 +1,4 @@
-#include <x86/vm.h>
+#include <x86/vaddr.h>
 
 ENTRY(_start)
 SECTIONS

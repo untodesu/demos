@@ -1,9 +1,11 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#ifndef _X86_VM_H_
-#define _X86_VM_H_ 1
+#ifndef _X86_VADDR_H_
+#define _X86_VADDR_H_ 1
 
+#define MEMORY_VIRTUAL_BASE 0xFFFF800000000000
 #define KERNEL_VIRTUAL_BASE 0xFFFFFFFF80000000
 #define KERNEL_LOAD_ADDRESS 0x0000000000200000
+#define PAGE_SIZE 0x1000
 
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
