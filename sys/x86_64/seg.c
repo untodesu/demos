@@ -3,7 +3,7 @@
 #include <sys/initcall.h>
 #include <sys/klog.h>
 #include <sys/kstring.h>
-#include <sys/segment.h>
+#include <sys/seg.h>
 
 #define SEG_READWRITE   (1 << 1)
 #define SEG_CONFORMING  (1 << 2)

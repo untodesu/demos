@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/io.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
+#include <sys/intr.h>
 #include <sys/klog.h>
 #include <sys/panic.h>
 #include <x86/i8259.h>
@@ -9,52 +9,45 @@
 #define I8259_CHIP1 0x20
 #define I8259_CHIP2 0xA0
 
-static int irq_enable = 0;
-static unsigned int irq_mask = 0;
-static interrupt_handler_t irq_handlers[I8250_IRQ_COUNT] = { 0 };
+static unsigned int mask = 0;
+static interrupt_t handlers[I8250_IRQ_COUNT] = { 0 };
 
-static void common_irq_handler(struct interrupt_frame *frame)
+static void common_irq_handler(struct interrupt_frame *frame, void *data)
 {
-    unsigned int irqvector, bit, isr;
-    if(frame->vector >= I8259_IRQ_BASE && frame->vector < I8259_IRQ_LIMIT) {
-        irqvector = frame->vector - I8259_IRQ_BASE;
-        bit = (1 << irqvector);
+    unsigned int irqvector = frame->vector - I8259_IRQ_BASE;
+    unsigned int bit = (1 << irqvector);
+    unsigned int isr;
 
-        /* OCW3: read in-service register */
-        io_write8(I8259_CHIP1, 0x0B);
-        io_write8(I8259_CHIP2, 0x0B);
-        isr = io_read8(I8259_CHIP1) | (io_read8(I8259_CHIP2) << 8);
+    /* OCW3 - read in-service register */
+    io_write8(I8259_CHIP1, 0x0B);
+    io_write8(I8259_CHIP2, 0x0B);
+    isr = io_read8(I8259_CHIP1) | (io_read8(I8259_CHIP2) << 8);
 
-        if(isr & bit) {
-            /* Send EOI */
-            if(bit & 0xF0)
-                io_write8(I8259_CHIP2, 0x20);
-            io_write16(I8259_CHIP1, 0x20);
-
-            /* Call handler */
-            if(irqvector != I8259_IRQ_CHIP2 && irq_handlers[irqvector])
-                irq_handlers[irqvector](frame);
-            return;
-        }
-
-        /* There's an imposter among us */
+    /* There's an imposter among us */
+    if(!(isr & bit)) {
         klog(KLOG_WARN, "i8259: spurious IRQ%u", irqvector);
         return;
     }
+
+    if(handlers[irqvector])
+        handlers[irqvector](frame, data);
+
+    /* Send EoI */
+    if(bit & 0xF0)
+        io_write8(I8259_CHIP2, 0x20);
+    io_write16(I8259_CHIP1, 0x20);
 }
 
 void i8259_disable_irqs(void)
 {
-    irq_enable = 0;
     io_write8(I8259_CHIP1 + 1, 0xFF);
     io_write8(I8259_CHIP2 + 1, 0xFF);
 }
 
 void i8259_enable_irqs(void)
 {
-    irq_enable = 1;
-    io_write8(I8259_CHIP1 + 1, (irq_mask & 0x00FF));
-    io_write8(I8259_CHIP2 + 1, (irq_mask & 0xFF00) >> 8);
+    io_write8(I8259_CHIP1 + 1, (mask & 0x00FF));
+    io_write8(I8259_CHIP2 + 1, (mask & 0xFF00) >> 8);
 }
 
 void i8259_mask_irq(unsigned int irqvector)
@@ -62,7 +55,7 @@ void i8259_mask_irq(unsigned int irqvector)
     unsigned int bit = (1 << irqvector);
     unsigned int shift = (bit & 0xF0) ? 8 : 0;
     io_addr_t port = (bit & 0xF0) ? I8259_CHIP2 : I8259_CHIP1;
-    io_write8(port + 1, ((irq_mask |= bit) >> shift) & 0xFF);
+    io_write8(port + 1, ((mask |= bit) >> shift) & 0xFF);
 }
 
 void i8259_unmask_irq(unsigned int irqvector)
@@ -70,38 +63,25 @@ void i8259_unmask_irq(unsigned int irqvector)
     unsigned int bit = (1 << irqvector);
     unsigned int shift = (bit & 0xF0) ? 8 : 0;
     io_addr_t port = (bit & 0xF0) ? I8259_CHIP2 : I8259_CHIP1;
-    io_write8(port + 1, ((irq_mask &= ~bit) >> shift) & 0xFF);
+    io_write8(port + 1, ((mask &= ~bit) >> shift) & 0xFF);
 }
 
-int i8259_set_irq_handler(unsigned int irqvector, interrupt_handler_t handler)
+int i8259_set_irq_handler(unsigned int irqvector, interrupt_t func, void *data)
 {
     if(irqvector == I8259_IRQ_CHIP2) {
-        klog(KLOG_ERROR, "i8259: IRQ2 not allowed for usage");
+        klog(KLOG_ERROR, "i8259: IRQ2 not allowed");
         return 0;
     }
 
-    if(irq_handlers[irqvector]) {
-        klog(KLOG_ERROR, "i8259: IRQ%u is already claimed!", irqvector);
-        return 0;
-    }
+    handlers[irqvector] = func;
 
-    irq_handlers[irqvector] = handler;
-    i8259_unmask_irq(irqvector);
+    set_interrupt_handler(I8259_IRQ_BASE + irqvector, &common_irq_handler, data);
 
     return 1;
 }
 
 static int init_i8259(void)
 {
-    unsigned int i;
-
-    /* Claim interrupt vectors */
-    for(i = I8259_IRQ_BASE; i < I8259_IRQ_LIMIT; i++) {
-        if(set_interrupt_handler(i, &common_irq_handler))
-            continue;
-        panic("i8259: unable to claim an interrupt vector 0x%02uX", i);
-    }
-
     /* Mask everything */
     io_write8(I8259_CHIP1 + 1, 0xFF);
     io_write8(I8259_CHIP2 + 1, 0xFF);
@@ -123,9 +103,12 @@ static int init_i8259(void)
     io_write8(I8259_CHIP2 + 1, (1 << 0));
 
     /* Mask everything except cascading IRQ */
-    irq_mask = 0xFFFF & ~(1 << I8259_IRQ_CHIP2);
-    io_write8(I8259_CHIP1 + 1, irq_mask & 0xFF);
-    io_write8(I8259_CHIP2 + 1, (irq_mask >> 8) & 0xFF);
+    mask = 0xFFFF & ~(1 << I8259_IRQ_CHIP2);
+    io_write8(I8259_CHIP1 + 1, mask & 0xFF);
+    io_write8(I8259_CHIP2 + 1, (mask >> 8) & 0xFF);
+
+    /* Call to this results in a mask upload */
+    i8259_enable_irqs();
 
     return 0;
 }

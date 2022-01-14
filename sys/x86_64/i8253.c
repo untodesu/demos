@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/io.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
+#include <sys/intr.h>
 #include <sys/klog.h>
 #include <x86/i8253.h>
 #include <x86/i8259.h>
@@ -15,7 +15,7 @@
 
 static size_t num_ticks = 0;
 
-static void timer_irq(__unused struct interrupt_frame *frame)
+static void irq_i8253(__unused struct interrupt_frame *frame, __unused void *data)
 {
     num_ticks++;
 
@@ -30,9 +30,8 @@ static int init_i8253(void)
 
     num_ticks = 0;
 
+    i8259_set_irq_handler(I8259_IRQ_I8253, &irq_i8253, NULL);
     i8259_unmask_irq(I8259_IRQ_I8253);
-    if(!i8259_set_irq_handler(I8259_IRQ_I8253, &timer_irq))
-        return 1;
 
     /* CH0, rate generator, 16-bit binary */
     io_write8(I8253_CMD, 0x34);

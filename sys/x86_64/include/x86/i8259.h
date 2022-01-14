@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _X86_I8259_H_
 #define _X86_I8259_H_ 1
+#include <sys/intr.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
 
 #define I8259_IRQ_BASE      0x20
 #define I8259_IRQ_LIMIT     0x30
-#define I8259_IRQ_M_OFF     0x00
-#define I8259_IRQ_S_OFF     0x08
+#define I8259_IRQ_CHIP1_OFF 0x00
+#define I8259_IRQ_CHIP2_OFF 0x08
 #define I8250_IRQ_COUNT     0x10
 
 #define I8259_IRQ_I8253     0x00
@@ -31,7 +31,7 @@ void i8259_disable_irqs(void);
 void i8259_enable_irqs(void);
 void i8259_mask_irq(unsigned int irqvector);
 void i8259_unmask_irq(unsigned int irqvector);
-int i8259_set_irq_handler(unsigned int irqvector, interrupt_handler_t handler);
+int i8259_set_irq_handler(unsigned int irqvector, interrupt_t func, void *data);
 
 initcall_extr(i8259);
 

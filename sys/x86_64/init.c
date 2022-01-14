@@ -3,7 +3,7 @@
 #include <stivale2.h>
 #include <sys/cdefs.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
+#include <sys/intr.h>
 #include <sys/klog.h>
 #include <sys/kstring.h>
 #include <x86/st2.h>

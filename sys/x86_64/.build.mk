@@ -15,10 +15,10 @@ srcs_y += head.c
 srcs_y += i8253.c
 srcs_y += i8259.c
 srcs_y += init.c
-srcs_y += interrupts.c
-srcs_y += interrupts.S
+srcs_y += intr.c
+srcs_y += intr.S
 srcs_y += pmm.c
-srcs_y += segment.c
+srcs_y += seg.c
 srcs_y += st2.c
 
 link.ld: $(TREE)/.link.in.ld
