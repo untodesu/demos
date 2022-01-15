@@ -76,12 +76,12 @@ static void ns16550_write(struct ns16550_state *ns, const void *s, size_t n)
 static struct console consoles[NUM_PORTS] = { 0 };
 static struct ns16550_state ports[NUM_PORTS] = {
     [0] = {
-        .name = "serial0",
+        .name = "ttyS0",
         .base = 0x3F8,
         .speed = CONFIG_NS16550_DEFAULT_SPEED
     },
     [1] = {
-        .name = "serial1",
+        .name = "ttyS1",
         .base = 0x2F8,
         .speed = CONFIG_NS16550_DEFAULT_SPEED
     }
