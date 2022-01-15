@@ -8,8 +8,7 @@ ASFLAGS		+= -pipe -ffreestanding -O2
 CFLAGS		+= -pipe -ffreestanding -O2
 CPPFLAGS	+= -nostdinc -D__kernel__=1
 CPPFLAGS	+= -I $(ROOT_PATH)/include
-CPPFLAGS	+= -I $(ROOT_PATH)/sys/include
-CPPFLAGS	+= -I $(ROOT_PATH)/sys/$(TARGET_ARCH)/include
+CPPFLAGS	+= -I $(ROOT_PATH)/$(TARGET_ARCH)/include
 LDFLAGS		+= -nostdlib -static -static-libgcc -lgcc
 
 CLNS :=
@@ -45,7 +44,9 @@ KBIN_INITCALLS_S := vmdemos_initcalls.S
 KBIN_INITCALLS_O := $(KBIN_INITCALLS_S:=.o)
 CLNS += $(KBIN_NOINIT) $(KBIN_INITCALLS_S) $(KBIN_INITCALLS_O)
 
-$(eval $(call recurse,sys))
+$(eval $(call recurse,drv))
+$(eval $(call recurse,kern))
+$(eval $(call recurse,$(TARGET_ARCH)))
 
 OBJS := $(SRCS:=.o)
 CLNS += $(OBJS)

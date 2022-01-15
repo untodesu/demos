@@ -10,4 +10,6 @@ entry git_rev hex_integer noedit
     set_value "$(git rev-parse --short=16 HEAD || echo 0)"
 endentry
 
-recurse sys
+recurse drv
+recurse kern
+recurse $target_arch

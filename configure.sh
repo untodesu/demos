@@ -49,7 +49,7 @@ info "using $target_objdump_exec"
 mkdir -p "$sysr_path"
 
 info "building tools"
-make install clean -C "$tool_path"
+make install -C "$tool_path"
 check_f "$tool_path/geninitcalls.sh"
 check_f "$tool_path/genconfig"
 
