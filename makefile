@@ -75,6 +75,6 @@ $(KBIN_NOINIT): $(OBJS) link.ld
 	$(LD) $(LDFLAGS) -T link.ld -r -o $@ $(OBJS)
 
 $(KBIN_INITCALLS_S):
-	$(TOOL_PATH)/geninitcalls.sh $(ROOT_PATH) $(OBJDUMP) $(KBIN_NOINIT) > $@
+	$(TOOL_PATH)/geninitcalls.sh $(OBJDUMP) $(KBIN_NOINIT) > $@
 
 .phony: $(PHONY_TARGETS)
