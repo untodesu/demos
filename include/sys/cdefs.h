@@ -14,10 +14,12 @@
 #define __aligned(x) __attribute__((aligned(x)))
 #define __deprecated(x) __attribute__((deprecated(x)))
 #define __format(x, y, z) __attribute__((format(x, y, z)))
+#define __likely(x) (__builtin_expect(!!(x), 1))
 #define __noreturn __attribute__((noreturn))
 #define __optimize(x) __attribute__((optimize(x)))
 #define __packed __attribute__((packed))
 #define __section(x) __attribute__((section(x)))
+#define __unlikely(x) (__builtin_expect(!!(x), 0))
 #ifndef __unused
     #define __unused __attribute__((unused))
 #endif

@@ -20,14 +20,14 @@ static void irq_i8253(__unused struct interrupt_frame *frame, __unused void *dat
 {
     num_ticks++;
     if(num_ticks % I8253_TARGET == 0)
-        printk(LOGLEVEL_DEBUG, "i8253: %zus", num_ticks / I8253_TARGET);
+        pk_debug("i8253: %zus", num_ticks / I8253_TARGET);
     ((volatile uint16_t *)(0xB8000))[num_ticks % (80 * 25)] = num_ticks & 0xFFFF;
 }
 
 static int init_i8253(void)
 {
     uint16_t divisor = (uint16_t)(I8253_SPEED / I8253_TARGET);
-    printk(LOGLEVEL_DEBUG, "i8253: divisor=%hu", divisor);
+    pk_debug("i8253: divisor=%hu", divisor);
 
     num_ticks = 0;
 

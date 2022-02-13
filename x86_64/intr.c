@@ -86,7 +86,7 @@ static int init_interrupts(void)
     idt_ptr.limit = (uint16_t)(sizeof(idt) - 1);
     idt_ptr.base = (uintptr_t)(&idt[0]);
 
-    printk(LOGLEVEL_INFO, "idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
+    pk_info("idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
 
     asm volatile("lidtq %0"::"m"(idt_ptr));
 

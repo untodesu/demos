@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/cdefs.h>
+#include <sys/debug.h>
 #include <sys/intr.h>
-#include <sys/panic.h>
 #include <sys/printk.h>
 #include <sys/string.h>
 #include <x86/pmm.h>
@@ -64,12 +64,10 @@ static int init_pmm(void)
     const char *entry_type_s;
 
     mmap = st2_find_tag(STIVALE2_STRUCT_TAG_MEMMAP_ID);
-    if(!mmap) {
-        /* FIXME: is this necessary considering most of
-         * stivale-compliant bootloaders pass the mmap tag? */
-        panic("pmm: no memmap was provided by the bootloader!");
-        return 1;
-    }
+    
+    /* FIXME: is this necessary considering most of
+     * stivale2-compliant bootloaders pass the mmap tag? */
+    kassert_msg(mmap, "pmm: no memmap was provided by the bootloader!");
 
     phys_limit = 0;
     total_pages = 0;
@@ -120,7 +118,7 @@ static int init_pmm(void)
             phys_limit = new_limit;
         }
 
-        printk(LOGLEVEL_INFO, "pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
+        pk_info("pmm: mmap: [%p -> %p], %s", (void *)entry->base, (void *)(new_limit - 1), entry_type_s);
     }
 
     bitmap = NULL;
@@ -155,8 +153,8 @@ static int init_pmm(void)
 
     free_kib = (total_pages - used_pages) * PAGE_SIZE / 1024;
     total_kib /= 1024;
-    printk(LOGLEVEL_DEBUG, "pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz / sizeof(uint32_t));
-    printk(LOGLEVEL_DEBUG, "pmm: %zu/%zu KiB (%zu/%zu MiB) free/usable", free_kib, total_kib, free_kib / 1024, total_kib / 1024);
+    pk_debug("pmm: bitmap: at=%p, size=%zu", (void *)bitmap, bsz / sizeof(uint32_t));
+    pk_debug("pmm: %zu/%zu KiB (%zu/%zu MiB) free/usable", free_kib, total_kib, free_kib / 1024, total_kib / 1024);
 
     return 0;
 }

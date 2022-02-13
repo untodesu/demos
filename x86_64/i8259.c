@@ -2,7 +2,6 @@
 #include <sys/io.h>
 #include <sys/initcall.h>
 #include <sys/intr.h>
-#include <sys/panic.h>
 #include <sys/printk.h>
 #include <x86/i8259.h>
 
@@ -25,7 +24,7 @@ static void common_irq_handler(struct interrupt_frame *frame, void *data)
 
     /* There's an imposter among us */
     if(!(isr & bit)) {
-        printk(LOGLEVEL_NOTICE, "8259: spurious IRQ%u", irqvector);
+        pk_notice("8259: spurious IRQ%u", irqvector);
         return;
     }
 
@@ -69,7 +68,7 @@ void i8259_unmask_irq(unsigned int irqvector)
 int i8259_set_irq_handler(unsigned int irqvector, interrupt_t func, void *data)
 {
     if(irqvector == I8259_IRQ_CHIP2) {
-        printk(LOGLEVEL_WARN, "8259: IRQ2 not allowed");
+        pk_warn("8259: IRQ2 not allowed");
         return 0;
     }
 

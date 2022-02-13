@@ -4,41 +4,41 @@
 #include <sys/sprintf.h>
 #include <sys/string.h>
 
-typedef char printk_msg_t[CONFIG_PRINTK_MESSAGE_SIZE];
+typedef char pk_msg_t[CONFIG_PK_MSG_SIZE];
 
-static printk_msg_t printk_buf[CONFIG_PRINTK_BUFFER_LENGTH] = { 0 };
-static size_t printk_buf_beg = 0;
-static size_t printk_buf_end = 0;
+static pk_msg_t pk_buffer[CONFIG_PK_BUFFER_LENGTH] = { 0 };
+static size_t pk_buffer_beg = 0;
+static size_t pk_buffer_end = 0;
+static short pk_log_level = 20;
 
-struct console *console_drivers = NULL;
-short log_level = 20;
+struct pk_sink *pk_sinks = NULL;
 
-static void call_console_drivers(const void *s, size_t n)
+static void pk_write_all(const void *s, size_t n)
 {
-    struct console *con;
-    for(con = console_drivers; con; con = con->next) {
-        if(!con->write)
+    struct pk_sink *sink;
+    for(sink = pk_sinks; sink; sink = sink->next) {
+        if(!sink->write)
             continue;
-        con->write(con, s, n);
+        sink->write(sink, s, n);
     }
 }
 
 int printkv(int level, const char *fmt, va_list va)
 {
     int result;
-    printk_msg_t *msg;
+    pk_msg_t *msg;
 
-    if(level < log_level) {
-        msg = printk_buf + printk_buf_end;
+    if(level < pk_log_level) {
+        msg = pk_buffer + pk_buffer_end;
 
-        memset(*msg, 0, sizeof(printk_msg_t));
-        result = vsnprintf(*msg, sizeof(printk_msg_t) - 2, fmt, va);
-        strncat(*msg, "\r\n", sizeof(printk_msg_t));
-        call_console_drivers(*msg, strlen(*msg));
+        memset(*msg, 0, sizeof(pk_msg_t));
+        result = vsnprintf(*msg, sizeof(pk_msg_t) - 3, fmt, va);
+        strncat(*msg, "\r\n", sizeof(pk_msg_t));
+        pk_write_all(*msg, strlen(*msg));
 
-        printk_buf_end++;
-        printk_buf_beg = printk_buf_end / CONFIG_PRINTK_BUFFER_LENGTH;
-        printk_buf_end = printk_buf_end % CONFIG_PRINTK_BUFFER_LENGTH;
+        pk_buffer_end++;
+        pk_buffer_beg = pk_buffer_end / CONFIG_PK_BUFFER_LENGTH;
+        pk_buffer_end = pk_buffer_end % CONFIG_PK_BUFFER_LENGTH;
 
         return result;
     }
@@ -48,34 +48,38 @@ int printkv(int level, const char *fmt, va_list va)
 
 int printk(int level, const char *fmt, ...)
 {
-    va_list va;
     int result;
+    va_list va;
 
-    if(level < log_level) {
+    if(level < pk_log_level) {
         va_start(va, fmt);
         result = printkv(level, fmt, va);
         va_end(va);
-
         return result;
     }
 
     return 0;
 }
 
-void register_console(struct console *newcon)
+void set_pk_level(short new_level)
 {
-    printk_msg_t *msg;
-    unsigned int i;
+    pk_log_level = new_level;
+}
 
-    if(newcon->write) {
-        for(i = 0; i < CONFIG_PRINTK_BUFFER_LENGTH; i++) {
-            msg = printk_buf + (i + printk_buf_end) % CONFIG_PRINTK_BUFFER_LENGTH;
-            newcon->write(newcon, *msg, strlen(*msg));
+void register_pk_sink(struct pk_sink *sink)
+{
+    unsigned int i;
+    pk_msg_t *msg;
+
+    if(sink->write) {
+        for(i = 0; i < CONFIG_PK_BUFFER_LENGTH; i++) {
+            msg = pk_buffer + (i + pk_buffer_end) % CONFIG_PK_BUFFER_LENGTH;
+            sink->write(sink, *msg, strlen(*msg));
         }
     }
 
-    newcon->index = console_drivers ? (console_drivers->index + 1) : 0;
-    newcon->next = console_drivers;
+    sink->index = pk_sinks ? (pk_sinks->index + 1) : 0;
+    sink->next = pk_sinks;
 
-    console_drivers = newcon;
+    pk_sinks = sink;
 }

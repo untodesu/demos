@@ -56,7 +56,7 @@ static int init_segment(void)
     gdt_ptr.limit = (uint16_t)(sizeof(gdt) - 1);
     gdt_ptr.base = (uintptr_t)(&gdt[0]);
 
-    printk(LOGLEVEL_INFO, "gdt: limit=%hu, base=%p", gdt_ptr.limit, (void *)gdt_ptr.base);
+    pk_info("gdt: limit=%hu, base=%p", gdt_ptr.limit, (void *)gdt_ptr.base);
 
     asm volatile("lgdtq %0"::"m"(gdt_ptr));
     asm volatile(

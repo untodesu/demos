@@ -19,8 +19,8 @@ static void do_initcalls(void)
 
 static int init_version(void)
 {
-    printk(LOGLEVEL_INFO, "kernel version %s", CONFIG_VERSION);
-    printk(LOGLEVEL_INFO, "bootloader: %s %s", st2.bootloader_brand, st2.bootloader_version);
+    pk_info("kernel version %s", CONFIG_VERSION);
+    pk_info("bootloader: %s %s", st2.bootloader_brand, st2.bootloader_version);
     return 0;
 }
 
