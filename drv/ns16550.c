@@ -92,7 +92,7 @@ static void ns16550_sink_write(struct pk_sink *sink, const void *s, size_t n)
     ns16550_write(sink->sink_data, s, n);
 }
 
-static int init_ns16550_console(void)
+static int init_ns16550_sink(void)
 {
     unsigned int i;
     for(i = 0; i < NUM_PORTS; i++) {
@@ -108,4 +108,4 @@ static int init_ns16550_console(void)
 
     return 0;
 }
-kernel_initcall(ns16550_console, init_ns16550_console);
+kernel_initcall(ns16550_pk_sink, init_ns16550_sink);
