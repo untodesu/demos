@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#include <sys/intr.h>
+#include <sys/interrupts.h>
 #include <sys/printk.h>
-#include <sys/seg.h>
 #include <sys/string.h>
+#include <x86/segment.h>
 
 #define IDT_SIZE 256
 

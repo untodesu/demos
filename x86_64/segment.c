@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <sys/initcall.h>
 #include <sys/printk.h>
-#include <sys/seg.h>
 #include <sys/string.h>
+#include <x86/segment.h>
 
 #define SEG_READWRITE   (1 << 1)
 #define SEG_CONFORMING  (1 << 2)

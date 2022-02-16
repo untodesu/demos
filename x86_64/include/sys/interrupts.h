@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#ifndef _SYS_INTR_H_
-#define _SYS_INTR_H_ 1
+#ifndef _SYS_INTERRUPTS_H_
+#define _SYS_INTERRUPTS_H_ 1
 #include <sys/cpu.h>
 #include <sys/initcall.h>
 #include <stdint.h>

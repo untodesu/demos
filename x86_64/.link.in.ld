@@ -1,9 +1,9 @@
-#include <x86/vaddr.h>
+#include <sys/mmdefs.h>
 
 ENTRY(_start)
 SECTIONS
 {
-    . = (KERNEL_VIRTUAL_BASE + KERNEL_LOAD_ADDRESS);
+    . = (VMEM_CODE_BASE + PMEM_LOAD_BASE);
 
     .text ALIGN(4096) : {
         *(.text)

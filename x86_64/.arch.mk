@@ -6,6 +6,7 @@ X86_XFLAGS	:= -fno-pic -mcmodel=kernel -mno-3dnow -mno-80387 -mno-mmx -mno-red-z
 ASFLAGS		+= $(X86_XFLAGS)
 CFLAGS		+= $(X86_XFLAGS)
 LDFLAGS		+= -fno-pie -Wl,-static,--no-dynamic-linker,-ztext -z max-page-size=0x1000
+CPPFLAGS	+= -D__x86_64__=1 -D__X86_64__=1
 
 ISOBIN := demos-$(CONFIG_VERSION).$(TARGET_ARCH).iso
 

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
 #include <sys/initcall.h>
-#include <sys/intr.h>
+#include <sys/interrupts.h>
 #include <sys/io.h>
 #include <sys/printk.h>
 #include <sys/string.h>
@@ -34,7 +34,7 @@ static int init_ns16550(struct ns16550_state *ns)
     /* Check for presense */
     io_write8(ns->base + UART_SCR, 0xAE);
     if(io_read8(ns->base + UART_SCR) != 0xAE) {
-        pk_notice("ns16550: %s not present", ns->name);
+        pk_notice("ns16550: %s is not present", ns->name);
         return 0;
     }
 
@@ -58,6 +58,8 @@ static int init_ns16550(struct ns16550_state *ns)
     }
 
     io_write8(ns->base + UART_MCR, 0x0F);
+
+    pk_debug("ns16550: %s is OK", ns->name);
 
     return 1;
 }

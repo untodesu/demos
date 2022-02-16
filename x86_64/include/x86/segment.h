@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
-#ifndef _SYS_SEG_H_
-#define _SYS_SEG_H_ 1
+#ifndef _SYS_SEGMENT_H_
+#define _SYS_SEGMENT_H_ 1
 
 #define SEG_INDEX_NULL_NULL 0
 #define SEG_INDEX_KERN_CODE 1

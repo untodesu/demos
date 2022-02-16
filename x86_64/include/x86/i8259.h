@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #ifndef _X86_I8259_H_
 #define _X86_I8259_H_ 1
-#include <sys/intr.h>
+#include <sys/interrupts.h>
 #include <sys/initcall.h>
 
 #define I8259_IRQ_BASE      0x20
