@@ -1,3 +1,9 @@
+entry kern.boot.stack_size unsigned_integer
+    describe "Kernel stack size on boot"
+    set_macro "BOOT_STACK_SIZE"
+    set_value 16384
+endentry
+
 entry kern.printk.message_size unsigned_integer
     describe "printk message size limit"
     set_macro "PK_MSG_SIZE"

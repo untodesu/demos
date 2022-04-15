@@ -80,7 +80,7 @@ static int init_interrupts(void)
         /* Guess the gate type by index */
         flags |= (i == 0 || i == 1 || (i >= 3 && i <= 31)) ? IDT_TRAP : IDT_INTR;
 
-        set_entry(i, SEG_SELECTOR(SEG_INDEX_KERN_CODE, 0, 0), interrupt_stubs[i], flags);
+        set_entry(i, SEG_SELECTOR(SEG_INDEX_KERN_CODE_64, 0, 0), interrupt_stubs[i], flags);
     }
 
     idt_ptr.limit = (uint16_t)(sizeof(idt) - 1);
