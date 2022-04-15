@@ -29,10 +29,10 @@ $(SYSR_PATH)/$(KBIN): $(KBIN)
 $(ISOBIN): $(SYSR_PATH)/boot/limine.cfg $(SYSR_PATH)/$(KBIN)
 	xorriso	-as mkisofs -b boot/limine-cd.bin							\
 			-no-emul-boot -boot-load-size 4 -boot-info-table			\
-			--efi-boot boot/limine-eltorito-efi.bin						\
+			--efi-boot boot/limine-cd-efi.bin							\
 			-efi-boot-part --efi-boot-image --protective-msdos-label	\
 			$(SYSR_PATH) -o $(ISOBIN)
-	$(TOOL_PATH)/limine-install $(ISOBIN)
+	$(TOOL_PATH)/limine-deploy $(ISOBIN)
 
 PHONY_TARGETS += iso
 iso: $(ISOBIN)
