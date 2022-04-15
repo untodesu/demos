@@ -1,6 +1,5 @@
 #include <sys/mmdefs.h>
 
-ENTRY(_start)
 SECTIONS
 {
     . = (VMEM_CODE_BASE + PMEM_LOAD_BASE);

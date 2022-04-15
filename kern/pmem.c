@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
+#include <sys/boot.h>
 #include <sys/debug.h>
 #include <sys/printk.h>
 #include <sys/pmem.h>
@@ -92,65 +93,72 @@ void pmfree(void *page, size_t num_pages)
     alloc_temp = begin;
 }
 
+static inline int check_address(uintptr_t paddr)
+{
+#if defined(__X86_64__)
+    /* We don't like writing to low
+     * memory areas, BIOS still might have
+     * some valuable shit stored there. */
+    return paddr >= 0x100000;
+#else
+    return 1;
+#endif
+}
+
 static int init_pmem(void)
 {
     uint64_t i;
-    size_t bsz, num_tags;
+    size_t bsz;
     size_t free_kib, total_kib;
     uintptr_t new_phys_limit;
     pmem_page_t bitmap_page;
-    struct pmem_tag_s tag;
-    const char *tag_type;
-
-    _pmem_setup_arch();
-
-    num_tags = _pmem_get_num_tags();
-    kassert_msg(num_tags, "pmem: no memory information provided");
+    const char *entry_type_str;
+    const struct stivale2_mmap_entry *mmap_entry;
+    const struct stivale2_struct_tag_memmap *mmap_tag;
+    
+    mmap_tag = find_boot_tag(STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    kassert_msg(mmap_tag, "no memory map available");
 
     phys_limit = 0;
     total_pages = 0;
     total_kib = 0;
     used_pages = 0;
 
-    for(i = 0; i < num_tags; i++) {
-        kassert(_pmem_get_tag(i, &tag));
-
-        switch(tag.type) {
-            case PMEM_TYPE_RESV:
-                tag_type = "resv";
+    for(i = 0; i < mmap_tag->entries; i++) {
+        mmap_entry = &mmap_tag->memmap[i];
+        switch(mmap_entry->type) {
+            case STIVALE2_MMAP_RESERVED:
+                entry_type_str = "RESV";
                 break;
-            case PMEM_TYPE_MISC:
-                tag_type = "misc";
+            case STIVALE2_MMAP_KERNEL_AND_MODULES:
+                entry_type_str = "KERN";
                 break;
-            case PMEM_TYPE_KRNL:
-                tag_type = "krnl";
-                break;
-            case PMEM_TYPE_FREE:
-                tag_type = "free";
+            case STIVALE2_MMAP_USABLE:
+                entry_type_str = "FREE";
                 break;
             default:
-                tag_type = "some";
+                entry_type_str = "MISC";
                 break;
         }
 
-        new_phys_limit = tag.base + tag.limit;
+        new_phys_limit = mmap_entry->base + mmap_entry->length;
 
-        if(tag.type != PMEM_TYPE_RESV && tag.type != PMEM_TYPE_KRNL && new_phys_limit > phys_limit) {
-            total_kib += tag.limit;
+        if(mmap_entry->type != STIVALE2_MMAP_RESERVED && mmap_entry->type != STIVALE2_MMAP_KERNEL_AND_MODULES && new_phys_limit > phys_limit) {
+            total_kib += mmap_entry->length;
             phys_limit = new_phys_limit;
         }
 
-        pk_debug("pmem: %s tag %p:%p", tag_type, (void *)tag.base, (void *)(new_phys_limit - 1));
+        pk_debug("pmem: %s entry %p:%p", entry_type_str, (void *)mmap_entry->base, (void *)(new_phys_limit - 1));
     }
 
     bitmap = NULL;
     total_pages = calc_num_pages(phys_limit);
     bsz = total_pages / 32 * sizeof(uint32_t);
-    for(i = 0; i < num_tags; i++) {
-        kassert(_pmem_get_tag(i, &tag));
-        if(_pmem_addr_check(tag.base + tag.limit)) {
-            if(tag.type == PMEM_TYPE_FREE && tag.limit >= bsz) {
-                bitmap = phys_to_virt_data(tag.base);
+    for(i = 0; i < mmap_tag->entries; i++) {
+        mmap_entry = &mmap_tag->memmap[i];
+        if(check_address((uintptr_t)(mmap_entry->base + mmap_entry->length))) {
+            if(mmap_entry->type == STIVALE2_MMAP_USABLE && mmap_entry->length >= bsz) {
+                bitmap = phys_to_virt_data(mmap_entry->base);
                 break;
             }
         }
@@ -159,12 +167,12 @@ static int init_pmem(void)
     memset(bitmap, 0, bsz);
 
     used_pages = total_pages;
-    for(i = 0; i < num_tags; i++) {
-        kassert(_pmem_get_tag(i, &tag));
-        if(_pmem_addr_check(tag.base + tag.limit)) {
-            if(tag.type != PMEM_TYPE_FREE)
+    for(i = 0; i < mmap_tag->entries; i++) {
+        mmap_entry = &mmap_tag->memmap[i];
+        if(check_address((uintptr_t)(mmap_entry->base + mmap_entry->length))) {
+            if(mmap_entry->type != STIVALE2_MMAP_USABLE)
                 continue;
-            pmfree(phys_to_virt_data(tag.base), calc_num_pages(tag.limit));
+            pmfree(phys_to_virt_data(mmap_entry->base), calc_num_pages(mmap_entry->length));
         }
     }
 
@@ -180,4 +188,5 @@ static int init_pmem(void)
 
     return 0;
 }
+
 setup_initcall(pmem, init_pmem);

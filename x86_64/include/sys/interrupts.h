@@ -15,8 +15,6 @@ struct interrupt_frame {
 
 typedef void (*interrupt_t)(struct interrupt_frame *, void *);
 
-#define disable_interrupts() cpu_cli()
-#define enable_interrupts() cpu_sti()
 void set_interrupt_handler(unsigned int vector, interrupt_t func, void *data);
 
 initcall_extern(interrupts);

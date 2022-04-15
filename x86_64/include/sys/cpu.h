@@ -3,21 +3,26 @@
 #define _SYS_CPU_H_ 1
 #include <sys/cdefs.h>
 
-static inline void cpu_cli(void)
+static inline void disable_interrupts(void)
 {
     asm volatile("cli");
 }
 
-static inline void cpu_sti(void)
+static inline void enable_interrupts(void)
 {
     asm volatile("sti");
+}
+
+static inline void cpu_halt(void)
+{
+    asm volatile("hlt");
 }
 
 static inline void __noreturn cpu_brick(void)
 {
     for(;;) {
-        asm volatile("cli");
-        asm volatile("hlt");
+        disable_interrupts();
+        cpu_halt();
     }
 }
 
