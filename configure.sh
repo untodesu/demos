@@ -143,5 +143,5 @@ check_f "$config_chead"
 check_f "$config_make0"
 check_f "$config_make1"
 
-info "done"
+info "done!"
 exit 0
