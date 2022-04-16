@@ -111,4 +111,5 @@ static int init_ns16550_console(void)
 
     return 0;
 }
+
 kernel_initcall(ns16550_console, init_ns16550_console);

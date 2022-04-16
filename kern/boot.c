@@ -7,7 +7,7 @@
 #include <sys/printk.h>
 #include <sys/string.h>
 
-void kmain(void) __noreturn;
+static void kmain(void) __noreturn;
 static volatile struct limine_entry_point_request __used kmain_request = {
     .id = LIMINE_ENTRY_POINT_REQUEST,
     .revision = 0,
@@ -31,7 +31,7 @@ static void do_initcalls(void)
     }
 }
 
-void __noreturn kmain(void)
+static void __noreturn kmain(void)
 {
     const char *bootloader_name = "Limine-compliant";
     const char *bootloader_version = "unknown";
