@@ -1,1 +1,1 @@
-interrupt_stubs.S
+intr_stubs.S

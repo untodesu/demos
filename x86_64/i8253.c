@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <sys/io.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
+#include <sys/intr.h>
 #include <sys/printk.h>
 #include <x86/i8253.h>
 #include <x86/i8259.h>
@@ -16,12 +16,12 @@
 
 static size_t num_ticks = 0;
 
-static void irq_i8253(__unused struct interrupt_frame *frame, __unused void *data)
+static void irq_i8253(__unused struct intr_frame *frame, __unused void *data)
 {
     num_ticks++;
     if(num_ticks % I8253_TARGET == 0)
         pk_debug("i8253: %zus", num_ticks / I8253_TARGET);
-    ((volatile uint16_t *)(0xB8000))[num_ticks % (80 * 25)] = num_ticks & 0xFFFF;
+    /* ((volatile uint16_t *)(0xB8000))[num_ticks % (80 * 25)] = num_ticks & 0xFFFF; */
 }
 
 static int init_i8253(void)

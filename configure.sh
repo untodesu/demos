@@ -50,7 +50,7 @@ mkdir -p "$sysr_path"
 
 info "building tools"
 make install -C "$tool_path"
-check_f "$tool_path/geninitcalls.sh"
+check_f "$tool_path/gen_initcalls.sh"
 check_f "$tool_path/genconfig"
 
 config_ecur="null"

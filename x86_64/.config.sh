@@ -4,7 +4,7 @@ entry x86.bootloader_title string
     set_value "Demos/$target_arch"
 endentry
 
-check_f "$tool_path/x86_genintlist.sh"
+check_f "$tool_path/x86_gen_intr_stubs.sh"
 
 check_f "$config_path/.limine.in.cfg"
 check_f "$config_path/sysroot/boot/limine-cd.bin"

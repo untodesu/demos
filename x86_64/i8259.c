@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <sys/io.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
+#include <sys/intr.h>
 #include <sys/printk.h>
 #include <x86/i8259.h>
 
@@ -9,9 +9,9 @@
 #define I8259_CHIP2 0xA0
 
 static unsigned int mask = 0;
-static interrupt_t handlers[I8250_IRQ_COUNT] = { 0 };
+static intr_handler_t handlers[I8250_IRQ_COUNT] = { 0 };
 
-static void common_irq_handler(struct interrupt_frame *frame, void *data)
+static void common_irq_handler(struct intr_frame *frame, void *data)
 {
     unsigned int irqvector = frame->vector - I8259_IRQ_BASE;
     unsigned int bit = (1 << irqvector);
@@ -65,7 +65,7 @@ void i8259_unmask_irq(unsigned int irqvector)
     io_write8(port + 1, ((mask &= ~bit) >> shift) & 0xFF);
 }
 
-int i8259_set_irq_handler(unsigned int irqvector, interrupt_t func, void *data)
+int i8259_set_irq_handler(unsigned int irqvector, intr_handler_t func, void *data)
 {
     if(irqvector == I8259_IRQ_CHIP2) {
         pk_warn("8259: IRQ2 not allowed");
@@ -74,7 +74,7 @@ int i8259_set_irq_handler(unsigned int irqvector, interrupt_t func, void *data)
 
     handlers[irqvector] = func;
 
-    set_interrupt_handler(I8259_IRQ_BASE + irqvector, &common_irq_handler, data);
+    set_intr_handler(I8259_IRQ_BASE + irqvector, &common_irq_handler, data);
 
     return 1;
 }
@@ -113,4 +113,4 @@ static int init_i8259(void)
 }
 
 boot_initcall(i8259, init_i8259);
-initcall_dependency(i8259, interrupts);
+initcall_dependency(i8259, intrs);

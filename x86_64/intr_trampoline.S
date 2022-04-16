@@ -20,7 +20,7 @@ __interrupt_trampoline:
     pushq %r15
 
     mov %rsp, %rdi
-    call interrupt_handler
+    call __intr_handler
 
     popq %r15
     popq %r14

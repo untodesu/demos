@@ -3,18 +3,6 @@
 #define _SYS_IO_H_ 1
 #include <stdint.h>
 
-/* TODO list:
- * [x]  Remake the legacy io  in a better way
- *      so we don't use actual instruction names:
- *      outb -> io_write8 with throttled counterparts.
- * [ ]  More io_throttle compatibility. not sure if
- *      it's really needed but linux seems to cover
- *      more cases where hardware misbehaves: the port 0x80
- *      may be taken on some IBM PC clones because there
- *      WAS and IS not a single standard about io throttling.
- * [ ]  Memory-mapped io along with acpi table parsing.
- */
-
 #define IO_LEGACY_IN8   "inb"
 #define IO_LEGACY_IN16  "inw"
 #define IO_LEGACY_IN32  "inl"
@@ -29,6 +17,10 @@ typedef uint32_t    io_uint32_t;
 
 static inline void io_throttle(void)
 {
+    /* If I understood Linux source code correctly,
+     * certain platforms tend to "misbehave" and use
+     * this port for something else. We might have to
+     * account for that in future. */
     asm volatile("outb %0, $0x80"::"a"((io_uint8_t)0));
 }
 

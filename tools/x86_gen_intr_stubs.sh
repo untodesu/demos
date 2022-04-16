@@ -16,8 +16,8 @@ done
 echo
 
 echo ".section .rodata"
-echo ".global interrupt_stubs"
-echo "interrupt_stubs:"
+echo ".global __intr_stubs"
+echo "__intr_stubs:"
 for i in $(seq 0 255); do
 echo ".quad interrupt_$i"
 done

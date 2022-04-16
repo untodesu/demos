@@ -1,44 +1,44 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
+#include <sys/console.h>
 #include <sys/printk.h>
 #include <sys/sprintf.h>
 #include <sys/string.h>
 
-typedef char pk_msg_t[CONFIG_PK_MSG_SIZE];
+typedef char printk_msg_t[CONFIG_PRINTK_MSG_SIZE];
 
-static pk_msg_t pk_buffer[CONFIG_PK_BUFFER_LENGTH] = { 0 };
-static size_t pk_buffer_beg = 0;
-static size_t pk_buffer_end = 0;
-static short pk_log_level = 20;
+static printk_msg_t printk_buffer[CONFIG_PRINTK_BUFFER_LENGTH] = { 0 };
+static size_t printk_buffer_beg = 0;
+static size_t printk_buffer_end = 0;
 
-struct pk_sink *pk_sinks = NULL;
+short printk_level = 20;
 
-static void pk_write_all(const void *s, size_t n)
+static void write_to_consoles(const void *s, size_t n)
 {
-    struct pk_sink *sink;
-    for(sink = pk_sinks; sink; sink = sink->next) {
-        if(!sink->write)
+    struct console *console;
+    for(console = console_drivers; console; console = console->next) {
+        if(!console->write)
             continue;
-        sink->write(sink, s, n);
+        console->write(console, s, n);
     }
 }
 
 int printkv(int level, const char *fmt, va_list va)
 {
     int result;
-    pk_msg_t *msg;
+    printk_msg_t *msg;
 
-    if(level < pk_log_level) {
-        msg = pk_buffer + pk_buffer_end;
+    if(level < printk_level) {
+        msg = printk_buffer + printk_buffer_end;
 
-        memset(*msg, 0, sizeof(pk_msg_t));
-        result = vsnprintf(*msg, sizeof(pk_msg_t) - 3, fmt, va);
-        strncat(*msg, "\r\n", sizeof(pk_msg_t));
-        pk_write_all(*msg, strlen(*msg));
+        memset(*msg, 0, sizeof(printk_msg_t));
+        result = vsnprintf(*msg, sizeof(printk_msg_t) - 3, fmt, va);
+        strncat(*msg, "\r\n", sizeof(printk_msg_t));
+        write_to_consoles(*msg, strlen(*msg));
 
-        pk_buffer_end++;
-        pk_buffer_beg = pk_buffer_end / CONFIG_PK_BUFFER_LENGTH;
-        pk_buffer_end = pk_buffer_end % CONFIG_PK_BUFFER_LENGTH;
+        printk_buffer_end++;
+        printk_buffer_beg = printk_buffer_end / CONFIG_PRINTK_BUFFER_LENGTH;
+        printk_buffer_end = printk_buffer_end % CONFIG_PRINTK_BUFFER_LENGTH;
 
         return result;
     }
@@ -51,7 +51,7 @@ int printk(int level, const char *fmt, ...)
     int result;
     va_list va;
 
-    if(level < pk_log_level) {
+    if(level < printk_level) {
         va_start(va, fmt);
         result = printkv(level, fmt, va);
         va_end(va);
@@ -61,25 +61,15 @@ int printk(int level, const char *fmt, ...)
     return 0;
 }
 
-void set_pk_level(short new_level)
-{
-    pk_log_level = new_level;
-}
-
-void register_pk_sink(struct pk_sink *sink)
+void printk_flush_console(struct console *console)
 {
     unsigned int i;
-    pk_msg_t *msg;
+    printk_msg_t *msg;
 
-    if(sink->write) {
-        for(i = 0; i < CONFIG_PK_BUFFER_LENGTH; i++) {
-            msg = pk_buffer + (i + pk_buffer_end) % CONFIG_PK_BUFFER_LENGTH;
-            sink->write(sink, *msg, strlen(*msg));
+    if(console->write) {
+        for(i = 0; i < CONFIG_PRINTK_BUFFER_LENGTH; i++) {
+            msg = printk_buffer + (i + printk_buffer_end) % CONFIG_PRINTK_BUFFER_LENGTH;
+            console->write(console, *msg, strlen(*msg));
         }
     }
-
-    sink->index = pk_sinks ? (pk_sinks->index + 1) : 0;
-    sink->next = pk_sinks;
-
-    pk_sinks = sink;
 }

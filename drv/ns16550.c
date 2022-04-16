@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 #include <config.h>
+#include <sys/console.h>
 #include <sys/initcall.h>
-#include <sys/interrupts.h>
 #include <sys/io.h>
 #include <sys/printk.h>
 #include <sys/string.h>
@@ -75,7 +75,7 @@ static void ns16550_write(struct ns16550_state *ns, const void *s, size_t n)
 
 #define NUM_PORTS 2
 
-static struct pk_sink port_sinks[NUM_PORTS] = { 0 };
+static struct console port_consoles[NUM_PORTS] = { 0 };
 static struct ns16550_state ports[NUM_PORTS] = {
     [0] = {
         .name = "ttyS0",
@@ -89,25 +89,26 @@ static struct ns16550_state ports[NUM_PORTS] = {
     }
 };
 
-static void ns16550_sink_write(struct pk_sink *sink, const void *s, size_t n)
+static void ns16550_console_write(struct console *console, const void *s, size_t n)
 {
-    ns16550_write(sink->sink_data, s, n);
+    ns16550_write(console->data, s, n);
 }
 
-static int init_ns16550_sink(void)
+static int init_ns16550_console(void)
 {
     unsigned int i;
     for(i = 0; i < NUM_PORTS; i++) {
         if(init_ns16550(&ports[i])) {
-            memset(port_sinks[i].name, 0, sizeof(port_sinks[i].name));
-            strncpy(port_sinks[i].name, ports[i].name, sizeof(port_sinks[i].name));
-            port_sinks[i].write = &ns16550_sink_write;
-            port_sinks[i].sink_data = &ports[i];
-            port_sinks[i].index = PK_INVALID_INDEX;
-            register_pk_sink(&port_sinks[i]);
+            memset(port_consoles[i].name, 0, sizeof(port_consoles[i].name));
+            strncpy(port_consoles[i].name, ports[i].name, sizeof(port_consoles[i].name));
+            port_consoles[i].write = &ns16550_console_write;
+            port_consoles[i].data = &ports[i];
+            port_consoles[i].index = CONSOLE_NULL_INDEX;
+            port_consoles[i].flags = CONSOLE_FLUSH_ON_INIT;
+            register_console(&port_consoles[i]);
         }
     }
 
     return 0;
 }
-kernel_initcall(ns16550_pk_sink, init_ns16550_sink);
+kernel_initcall(ns16550_console, init_ns16550_console);

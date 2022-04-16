@@ -14,23 +14,13 @@
 #define PKL_INFO    6
 #define PKL_DEBUG   7
 
-#define PK_INVALID_INDEX (-1)
-
-struct pk_sink {
-    char name[32];
-    short index;
-    void *sink_data;
-    void(*write)(struct pk_sink *, const void *, size_t);
-    struct pk_sink *next;
-};
-
-/* access all the registered sinks */
-extern struct pk_sink *pk_sinks;
+extern short printk_level;
 
 int printkv(int level, const char *fmt, va_list va);
 int printk(int level, const char *fmt, ...) __format(printf, 2, 3);
-void set_pk_level(short new_level);
-void register_pk_sink(struct pk_sink *sink);
+
+struct console;
+void printk_flush_console(struct console *console);
 
 #define pk_emerg(fmt, ...)  printk(PKL_EMERG,   (fmt), ##__VA_ARGS__)
 #define pk_alert(fmt, ...)  printk(PKL_ALERT,   (fmt), ##__VA_ARGS__)
