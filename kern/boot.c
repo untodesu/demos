@@ -25,8 +25,8 @@ static void do_initcalls(void)
 {
     size_t i;
     for(i = 0; initcalls[i]; i++) {
-        /* TODO: do not ignore
-         * the return code. */
+        if(!initcalls[i])
+            continue;
         initcalls[i]();
     }
 }

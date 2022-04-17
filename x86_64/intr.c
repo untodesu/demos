@@ -65,7 +65,7 @@ void set_intr_handler(unsigned int vector, intr_handler_t func, void *data)
     handlers[vector].func = func;
 }
 
-static int init_intrs(void)
+static void init_intrs(void)
 {
     uint8_t flags;
     unsigned int i;
@@ -89,8 +89,6 @@ static int init_intrs(void)
     pk_info("idt: limit=%hu, base=%p", idt_ptr.limit, (void *)idt_ptr.base);
 
     asm volatile("lidtq %0"::"m"(idt_ptr));
-
-    return 0;
 }
 
 boot_initcall(intrs, init_intrs);

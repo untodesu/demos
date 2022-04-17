@@ -94,7 +94,7 @@ static void ns16550_console_write(struct console *console, const void *s, size_t
     ns16550_write(console->data, s, n);
 }
 
-static int init_ns16550_console(void)
+static void init_ns16550_console(void)
 {
     unsigned int i;
     for(i = 0; i < NUM_PORTS; i++) {
@@ -108,8 +108,6 @@ static int init_ns16550_console(void)
             register_console(&port_consoles[i]);
         }
     }
-
-    return 0;
 }
 
 kernel_initcall(ns16550_console, init_ns16550_console);

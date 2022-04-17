@@ -13,6 +13,7 @@ struct pmem_stats {
 
 typedef uint64_t pmem_page_t;
 
+static uintptr_t phys_offset = 0;
 static uintptr_t phys_limit = 0;
 static size_t total_pages = 0;
 static struct pmem_stats stats = { 0 };
@@ -115,27 +116,15 @@ void pmfree(void *page, size_t num_pages)
 
 uintptr_t vptr_to_pptr(void *vptr)
 {
-    return (uintptr_t)((uint64_t)vptr - hhdm_request.response->offset);
+    return (uintptr_t)((uintptr_t)vptr - phys_offset);
 }
 
 void *pptr_to_vptr(uintptr_t pptr)
 {
-    return (void *)((uint64_t)pptr + hhdm_request.response->offset);
+    return (void *)((uintptr_t)pptr + phys_offset);
 }
 
-static inline int check_address(uintptr_t paddr)
-{
-#if defined(__X86_64__)
-    /* We don't like writing to low
-     * memory areas, BIOS still might have
-     * some valuable shit stored there. */
-    return paddr >= 0x100000;
-#else
-    return 1;
-#endif
-}
-
-static int init_pmem(void)
+static void init_pmem(void)
 {
     uint64_t i;
     size_t bsz, kib_1, kib_2;
@@ -144,9 +133,10 @@ static int init_pmem(void)
     const char *entry_type_str;
     const struct limine_memmap_entry *mmap_entry;
 
-    kassert_msg(hhdm_request.response, "no hhdm info available");
-    kassert_msg(mmap_request.response, "no memory map available");
+    panic_unless_msg(hhdm_request.response, "pmem: no boot response for hhdm request");
+    panic_unless_msg(mmap_request.response, "pmem: no boot response for memory map request");
 
+    phys_offset = hhdm_request.response->offset;
     phys_limit = 0;
     stats.usable_memory = 0;
     total_pages = 0;
@@ -186,16 +176,14 @@ static int init_pmem(void)
         new_phys_limit = mmap_entry->base + mmap_entry->length;
 
         if(mmap_entry->type != LIMINE_MEMMAP_RESERVED && mmap_entry->type != LIMINE_MEMMAP_KERNEL_AND_MODULES && new_phys_limit > phys_limit) {
-            if(check_address((uintptr_t)(mmap_entry->base + mmap_entry->length))) {
-                switch(mmap_entry->type) {
-                    case LIMINE_MEMMAP_USABLE:
-                    case LIMINE_MEMMAP_ACPI_RECLAIMABLE:
-                    case LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE:
-                        stats.usable_memory += mmap_entry->length;
-                        break;
-                }
-            }
             phys_limit = new_phys_limit;
+            switch(mmap_entry->type) {
+                case LIMINE_MEMMAP_USABLE:
+                case LIMINE_MEMMAP_ACPI_RECLAIMABLE:
+                case LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE:
+                    stats.usable_memory += mmap_entry->length;
+                    break;
+            }
         }
 
         pk_debug("pmem: %p:%p - %s", (void *)mmap_entry->base, (void *)(new_phys_limit - 1), entry_type_str);
@@ -206,11 +194,9 @@ static int init_pmem(void)
     bsz = total_pages / 32 * sizeof(uint32_t);
     for(i = 0; i < mmap_request.response->entry_count; i++) {
         mmap_entry = mmap_request.response->entries[i];
-        if(check_address((uintptr_t)(mmap_entry->base + mmap_entry->length))) {
-            if(mmap_entry->type == LIMINE_MEMMAP_USABLE && mmap_entry->length >= bsz) {
-                bitmap = pptr_to_vptr(mmap_entry->base);
-                break;
-            }
+        if(mmap_entry->type == LIMINE_MEMMAP_USABLE && mmap_entry->length >= bsz) {
+            bitmap = pptr_to_vptr(mmap_entry->base);
+            break;
         }
     }
 
@@ -220,15 +206,13 @@ static int init_pmem(void)
     stats.used_memory = stats.usable_memory;
     for(i = 0; i < mmap_request.response->entry_count; i++) {
         mmap_entry = mmap_request.response->entries[i];
-        if(check_address((uintptr_t)(mmap_entry->base + mmap_entry->length))) {
-            if(mmap_entry->type != LIMINE_MEMMAP_USABLE)
-                continue;
-            pmfree(pptr_to_vptr(mmap_entry->base), calc_num_pages(mmap_entry->length));
-        }
+        if(mmap_entry->type != LIMINE_MEMMAP_USABLE)
+            continue;
+        pmfree(pptr_to_vptr(mmap_entry->base), calc_num_pages(mmap_entry->length));
     }
 
     bitmap_page = get_page(vptr_to_pptr(bitmap));
-    kassert(try_alloc(bitmap_page, bitmap_page + calc_num_pages(bsz)));
+    panic_unless_msg(try_alloc(bitmap_page, bitmap_page + calc_num_pages(bsz)), "pmem: bitmap allocation failed");
 
     alloc_temp = 0;
 
@@ -237,8 +221,6 @@ static int init_pmem(void)
     pk_debug("pmem: bitmap: at=%p, size=%zu (%zu bytes)", (void *)bitmap, bsz / sizeof(uint32_t), bsz);
     pk_debug("pmem: %zu/%zu KiB (%zu/%zu MiB) used/usable", kib_1, kib_2, kib_1 / 1024, kib_2 / 1024);
     pk_debug("pmem: %zu/%zu pages used/total", stats.used_pages, total_pages);
-
-    return 0;
 }
 
 setup_initcall(pmem, init_pmem);

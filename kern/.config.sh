@@ -15,3 +15,5 @@ entry kern.printk.buffer_length unsigned_integer
     set_macro "PRINTK_BUFFER_LENGTH"
     set_value 128
 endentry
+
+recurse acpi

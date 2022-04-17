@@ -1,3 +1,5 @@
+tree_y += acpi
+
 srcs_y += boot.c
 srcs_y += console.c
 srcs_y += ctype.c

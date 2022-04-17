@@ -66,7 +66,7 @@ void set_entry_64(uint8_t id, uint8_t flags)
     memcpy(gdt + id, &entry, sizeof(entry));
 }
 
-static int init_segment(void)
+static void init_segment(void)
 {
     uint8_t code_flags = SEG_READWRITE | SEG_NONSYSTEM | SEG_EXECUTABLE;
     uint8_t data_flags = SEG_READWRITE | SEG_NONSYSTEM;
@@ -102,8 +102,6 @@ static int init_segment(void)
         :
         : "i"(SEG_SELECTOR(SEG_INDEX_KERN_CODE_64, 0, 0)), "i"(SEG_SELECTOR(SEG_INDEX_KERN_DATA_64, 0, 0))
     );
-
-    return 0;
 }
 
 boot_initcall(segment, init_segment);

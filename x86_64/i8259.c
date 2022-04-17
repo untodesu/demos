@@ -79,7 +79,7 @@ int i8259_set_irq_handler(unsigned int irqvector, intr_handler_t func, void *dat
     return 1;
 }
 
-static int init_i8259(void)
+static void init_i8259(void)
 {
     /* Mask everything */
     io_write8(I8259_CHIP1 + 1, 0xFF);
@@ -108,8 +108,6 @@ static int init_i8259(void)
 
     /* Call to this results in a mask upload */
     i8259_enable_irqs();
-
-    return 0;
 }
 
 boot_initcall(i8259, init_i8259);

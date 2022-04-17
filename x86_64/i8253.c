@@ -24,7 +24,7 @@ static void irq_i8253(__unused struct intr_frame *frame, __unused void *data)
     /* ((volatile uint16_t *)(0xB8000))[num_ticks % (80 * 25)] = num_ticks & 0xFFFF; */
 }
 
-static int init_i8253(void)
+static void init_i8253(void)
 {
     uint16_t divisor = (uint16_t)(I8253_SPEED / I8253_TARGET);
     pk_debug("i8253: divisor=%hu", divisor);
@@ -38,8 +38,6 @@ static int init_i8253(void)
     io_write8(I8253_CMD, 0x34);
     io_write8(I8253_CH0, (divisor & 0x00FF));
     io_write8(I8253_CH0, (divisor & 0xFF00) >> 8);
-
-    return 0;
 }
 
 boot_initcall(i8253, init_i8253);

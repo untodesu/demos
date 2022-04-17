@@ -3,17 +3,17 @@
 #define _SYS_INITCALL_H_ 1
 #include <sys/cdefs.h>
 
-typedef int(*initcall_t)(void);
+typedef void(*initcall_t)(void);
 
 /* Used to link a function with the
  * specific initcall identifier. */
 #define initcall(id, fn) \
-    int __initcall_##id(void) __alias(fn)
+    void __initcall_##id(void) __alias(fn)
 
 /* Used to declare public initcalls in order
  * for other initcalls to depend on. */
 #define initcall_extern(id) \
-    int __initcall_##id(void)
+    void __initcall_##id(void)
 
 /* Guarantees that a specific initcall
  * will be called only after an another
