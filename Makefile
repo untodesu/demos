@@ -7,7 +7,6 @@
 
 # Make sure it's defined
 ARCH ?= x86_64
-KERNEL_FILE ?= kernel.elf
 
 include ./mk/$(ARCH)/flags.mk
 include ./mk/$(ARCH)/tools.mk
@@ -86,6 +85,9 @@ sysroot: $(KBIN)
 
 PHONY_TARGETS += all
 all: sysroot
+
+PHONY_TARGETS += kernel
+kernel: $(KBIN)
 
 # Build the kernel with initcalls
 $(KBIN): $(KBIN_NOINIT) $(KBIN_INITCALLS_O) $(KBIN_LDSCRIPT)
