@@ -1,4 +1,5 @@
-/* SPDX-License-Identifier: BSD-2-Clause */
+/* SPDX-License-Identifier: BSD-2-Clause
+ * Created: Sat Apr 23 2022 21:14:03 */
 #ifndef _SYS_CDEFS_H_
 #define _SYS_CDEFS_H_ 1
 
@@ -8,6 +9,13 @@
 #define __mark_used(x) ((void)(x))
 #define __concat1(x, y) x##y
 #define __concat(x, y) __concat1(x, y)
+
+/* Hacks to shut vscode up */
+#if __STDC_VERSION__ >= 199901L
+#define restrict __restrict__
+#elif defined(__cplusplus)
+#define restrict
+#endif
 
 /* GNU C attributes */
 #define __alias(x) __attribute__((alias(#x)))

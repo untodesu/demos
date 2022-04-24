@@ -1,27 +1,30 @@
-/* SPDX-License-Identifier: BSD-2-Clause */
+/* SPDX-License-Identifier: BSD-2-Clause
+ * Created: Sat Apr 23 2022 21:37:23 */
 #ifndef _SYS_CONSOLE_H_
 #define _SYS_CONSOLE_H_ 1
 #include <stddef.h>
 
-#define CONSOLE_MAX_NAME 32
-#define CONSOLE_NULL_INDEX (-1)
-#define CONSOLE_FLUSH_ON_INIT (1 << 0)
+#define CON_MAXNAME 32
+
+#define CON_FLUSH_INIT  0x01
+#define CON_AUTO_ENABLE 0x02
 
 struct console;
-typedef void(*console_write_t)(struct console *, const void *, size_t);
+typedef void(*console_init_t)(struct console *);
+typedef size_t(*console_write_t)(struct console *, const void *, size_t);
 
 struct console {
-    char name[32];
-    short flags;
-    short index;
+    char name[CON_MAXNAME];
+    console_init_t init_fn;
+    console_write_t write_fn;
+    unsigned short flags;
     void *data;
-    console_write_t write;
     struct console *next;
 };
 
-extern struct console *console_drivers;
-
-void register_console(struct console *console);
-int unregister_console(struct console *console);
+void console_reg(struct console *console);
+void console_enable(struct console *console);
+void console_disable(struct console *console);
+void console_write(const void *s, size_t n);
 
 #endif

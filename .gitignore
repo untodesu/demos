@@ -1,11 +1,16 @@
-/.vscode/
-/include/config.h
-/sysroot/
-config.deffile
-config.*.mk
-link.ld
-vmdemos*
-demos*.iso
+# Kernel binaires
+demos.iso
+kernel.elf
+kernel_noinit
+kernel_initcalls.S
+kernel_initcalls.o
+
+# Build artifacts
 *.c.o
 *.S.o
 *.s.o
+*.ld
+
+# Build subdirectories
+/.vscode/
+/sysroot/

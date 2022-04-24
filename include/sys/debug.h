@@ -1,11 +1,12 @@
-/* SPDX-License-Identifier: BSD-2-Clause */
+/* SPDX-License-Identifier: BSD-2-Clause
+ * Created: Sun Apr 24 2022 00:13:11 */
 #ifndef _SYS_DEBUG_H_
 #define _SYS_DEBUG_H_ 1
 #include <stdarg.h>
 #include <sys/cdefs.h>
 
-void __noreturn panicv(const char *fmt, va_list va);
-void __noreturn panic(const char *fmt, ...) __format(printf, 1, 2);
+void panicv(const char *fmt, va_list va) __noreturn;
+void panic(const char *fmt, ...) __noreturn __format(printf, 1, 2);
 
 #define panic_unless(x) \
     do { if(__unlikely(!(x))) { \
