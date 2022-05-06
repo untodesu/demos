@@ -4,13 +4,12 @@ TOPDIR := $(realpath ..)
 PHONY_TARGETS :=
 export TOPDIR
 
-PHONY_TARGETS += all
-all:
-	$(MAKE) all -C limine-deploy
+PHONY_TARGETS += all clean
 
-PHONY_TARGETS += clean
+all:
+	@$(MAKE) -C limine-deploy all
 clean:
-	$(MAKE) clean -C limine-deploy
+	@$(MAKE) -C limine-deploy clean
 
 # Set up phony targets
 .phony: $(PHONY_TARGETS)

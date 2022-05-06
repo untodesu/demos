@@ -8,6 +8,7 @@ CPP			?= cpp
 LD			?= gcc -g
 OBJDUMP		?= objdump
 
+CD			:= cd
 CP			:= cp
 ECHO		:= echo
 ENVSUBST	:= envsubst

@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Created: Sat May 07 2022 01:18:16
+KBIN_IMAGE := kernel.iso
+CLEAN_FILES += $(KBIN_IMAGE)
+PHONY_TARGETS += iso
+ALLS_DEPS += iso
+XORRISO := xorriso
+LIMINE_DEPLOY := ./tools.d/limine-deploy/limine-deploy
+
+# Bootable ISO image.
+iso: $(KBIN_IMAGE)
+
+# Generate the ISO image.
+$(KBIN_IMAGE): tools root $(LIMINE_DEPLOY)
+	@$(ECHO) "generating $@"
+	@$(XORRISO) -as mkisofs -b boot/limine-cd.bin \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		--efi-boot boot/limine-cd-efi.bin -efi-boot-part \
+		--efi-boot-image --protective-msdos-label ./root -o $@
+	@$(LIMINE_DEPLOY) $@

@@ -1,21 +1,29 @@
 # SPDX-License-Identifier: BSD-2-Clause
 # Created: Sat Apr 23 2022 21:18:52
 
-# These are not required
+# Make sure the ARCH is always defined.
+# Just make sure to pass it in the command
+# if you don't want this stinky x86 build.
+ARCH ?= x86_64
+
+# These are not required but
+# it would be nice if we have those.
 -include ./config.$(ARCH).mk
 -include ./config.mk
 
-# Make sure it's defined
-ARCH ?= x86_64
-
+# These define architecture-specific
+# tools and utilities such as C compiler.
 include ./mk/$(ARCH)/flags.mk
 include ./mk/$(ARCH)/tools.mk
 
+# These define other tools and utilities if the
+# architecture-specific headers did not do so.
 include ./mk/compile.mk
 include ./mk/flags.mk
 include ./mk/tools.mk
 
 PHONY_TARGETS :=
+ALLS_DEPS :=
 
 ASFLAGS	+= -O2 -Wall -Wextra -Werror -pedantic
 CCFLAGS	+= -Wall -Wextra -Werror -pedantic -std=gnu99
@@ -59,10 +67,10 @@ $(eval $(call recurse,sys))
 
 OBJECTS += $(SOURCES:=.o)
 
-KBIN := kernel.elf
-KBIN_NOINIT := kernel_noinit
-KBIN_INITCALLS_S := kernel_initcalls.S
-KBIN_INITCALLS_O := kernel_initcalls.o
+KBIN := ./kernel.elf
+KBIN_NOINIT := ./kernel_noinit
+KBIN_INITCALLS_S := ./kernel_initcalls.S
+KBIN_INITCALLS_O := ./kernel_initcalls.o
 KBIN_LDSCRIPT := ./lds/$(ARCH)/sys.ld
 
 CLEAN_FILES += $(OBJECTS)
@@ -70,24 +78,34 @@ CLEAN_FILES += $(KBIN) $(KBIN_NOINIT)
 CLEAN_FILES += $(KBIN_INITCALLS_S) $(KBIN_INITCALLS_O)
 CLEAN_FILES += $(KBIN_LDSCRIPT)
 
-PHONY_TARGETS += clean
+PHONY_TARGETS += all clean kernel root tools
+ALLS_DEPS += tools kernel root
+
+# Everything, I guess.
+all: $(ALLS_DEPS)
+
+# Cleanup.
 clean:
 	@$(RM) -v $(CLEAN_FILES)
-	@$(RM) -rv ./sysroot
+	@$(RM) -rv ./root
+	@$(MAKE) -C tools.d clean
 
-PHONY_TARGETS += sysroot
-sysroot: $(KBIN)
-	@$(ECHO) "generating sysroot"
-	@$(MKDIR) -p ./sysroot
-	@$(MKDIR) -p ./sysroot/boot
-	@$(CP) -a ./arch/$(ARCH)/sysroot ./
-	@$(CP) $(KBIN) ./sysroot/$(KBIN)
-
-PHONY_TARGETS += all
-all: sysroot
-
-PHONY_TARGETS += kernel
+# Kernel binary.
 kernel: $(KBIN)
+
+# System root.
+root: $(KBIN)
+	@$(ECHO) "generating root"
+	@$(MKDIR) -p ./root/boot
+	@$(CP) -a ./arch/$(ARCH)/root ./
+	@$(CP) $(KBIN) ./root/demos
+
+# Host utilities.
+# tools.d: make appears to completely
+# shit itself when we have a directory
+# with the same name as a phony target.
+tools:
+	@$(MAKE) -C tools.d all
 
 # Build the kernel with initcalls
 $(KBIN): $(KBIN_NOINIT) $(KBIN_INITCALLS_O) $(KBIN_LDSCRIPT)

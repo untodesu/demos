@@ -1,0 +1,10 @@
+QEMU := qemu-system-x86_64
+QEMU_ARGS :=
+PHONY_TARGETS += run_qemu
+
+QEMU_ARGS += -m 512M
+
+# Run QEMU with the bootable ISO image.
+run_qemu: $(KBIN_IMAGE)
+	@$(ECHO) "running QEMU ($(QEMU_ARGS))"
+	@$(QEMU) $(QEMU_ARGS) -cdrom $(KBIN_IMAGE)

@@ -1,6 +1,6 @@
 # Kernel binaires
-demos.iso
 kernel.elf
+kernel.iso
 kernel_noinit
 kernel_initcalls.S
 kernel_initcalls.o
@@ -13,4 +13,4 @@ kernel_initcalls.o
 
 # Build subdirectories
 /.vscode/
-/sysroot/
+/root/
